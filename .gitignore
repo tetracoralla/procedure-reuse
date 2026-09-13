@@ -1,0 +1,8 @@
+.tools/
+**/bin/
+**/dist/
+**/.verify/
+**/node_modules/
+*.tar.gz
+logs/
+repos/

@@ -1,0 +1,14 @@
+procedure-reuse
+Copyright 2026 openAdam
+
+This product includes software developed by openAdam.
+
+Licensed under the Apache License, Version 2.0.
+
+This repository is a review snapshot of reusable-method drafts that sit
+beside the Agent-Host Execution Architecture. It is not Agent Host Suite
+and does not modify that product.
+
+File Vitals, Capability Contracts, Procedure Contracts, and the Agent Tool
+Development Kit remain independently licensed Apache-2.0 products. Their
+names and trademarks belong to their respective owners.
