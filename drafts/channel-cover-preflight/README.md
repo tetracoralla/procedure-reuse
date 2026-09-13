@@ -30,8 +30,9 @@ scripts/run-procedure-conformance.sh
 From the workspace, Node 22 on PATH:
 
 ```bash
-node repos/agent-tool-development-kit/src/cli.mjs check --root drafts/channel-cover-preflight --json
-node repos/agent-tool-development-kit/src/cli.mjs pack --root drafts/channel-cover-preflight --json
+# Kit check/pack: clone the pinned Kit (docs/CLEAN_ENV.md), then:
+node .deps/agent-tool-development-kit/src/cli.mjs check --root drafts/channel-cover-preflight --json
+node .deps/agent-tool-development-kit/src/cli.mjs pack --root drafts/channel-cover-preflight --json
 ```
 
 Changing `specs/good-wrong-aspect.json` (16:9 → 4:3) on the same good files

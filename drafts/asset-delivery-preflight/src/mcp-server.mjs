@@ -240,7 +240,12 @@ export async function callTool(params) {
     throw new ToolError("LIMIT_EXCEEDED", `spec.slots exceeds the bound of ${MAX_SLOTS}`);
   }
 
-  const adapter = await resolveAdapter();
+  let adapter;
+  try {
+    adapter = await resolveAdapter();
+  } catch {
+    adapter = null;
+  }
   return toolResult(await runPreflight({
     spec,
     root: deliveryRoot,

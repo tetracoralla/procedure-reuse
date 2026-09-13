@@ -496,7 +496,14 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
     }
   }
   const inspectPaths = [...new Set(inspectBySlot.values())];
-  const responses = await inspectAll(adapter, inspectGrant, inspectPaths);
+  if (inspectPaths.length > 0 && !adapter) {
+    throw new Error(
+      "File Vitals JSONL adapter is required when declared files are present. Build it with scripts/build-file-vitals.sh (docs/CLEAN_ENV.md).",
+    );
+  }
+  const responses = inspectPaths.length === 0
+    ? new Map()
+    : await inspectAll(adapter, inspectGrant, inspectPaths);
 
   const checks = [];
   const slots = [];
@@ -603,8 +610,16 @@ export async function resolveAdapter(explicit) {
     }
   }
   throw new Error(
-    `File Vitals JSONL adapter not found. Build it with drafts/asset-delivery-preflight/scripts/build-file-vitals.sh (needs Go ${"1.26.6+"}). Looked at: ${candidates.join(", ") || DEFAULT_ADAPTER}`,
+    `File Vitals JSONL adapter not found. Clone the pinned File Vitals commit and run scripts/build-file-vitals.sh (Go 1.26.6+, docs/CLEAN_ENV.md). Looked at: ${candidates.join(", ") || DEFAULT_ADAPTER}`,
   );
+}
+
+async function optionalAdapter(explicit) {
+  try {
+    return await resolveAdapter(explicit);
+  } catch {
+    return null;
+  }
 }
 
 async function main(argv) {
@@ -628,7 +643,7 @@ async function main(argv) {
   const workspaceRoot = resolve(args.workspaceRoot ?? root);
   let adapter;
   try {
-    adapter = await resolveAdapter(args.adapter);
+    adapter = args.adapter ? await resolveAdapter(args.adapter) : await optionalAdapter();
     const spec = loadSpec(await readFile(specPath, "utf8"), specPath);
     spec._path = specPath;
     const rootInfo = await stat(root);

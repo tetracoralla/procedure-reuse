@@ -38,8 +38,9 @@ scripts/run-procedure-conformance.sh
 From the workspace, Node 22 on PATH:
 
 ```bash
-node repos/agent-tool-development-kit/src/cli.mjs check --root drafts/batch-delivery-preflight --json
-node repos/agent-tool-development-kit/src/cli.mjs pack --root drafts/batch-delivery-preflight --json
+# Kit check/pack: clone the pinned Kit (docs/CLEAN_ENV.md), then:
+node .deps/agent-tool-development-kit/src/cli.mjs check --root drafts/batch-delivery-preflight --json
+node .deps/agent-tool-development-kit/src/cli.mjs pack --root drafts/batch-delivery-preflight --json
 ```
 
 A good two-kit campaign passes. Dropping the covers directory fails with

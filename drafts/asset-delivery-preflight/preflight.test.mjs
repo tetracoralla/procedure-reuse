@@ -6,12 +6,15 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { adapterTest } from "../../scripts/lib/file-vitals-adapter.mjs";
 import {
   inspectPathForGrant,
   parseSpec,
   resolveAdapter,
   runPreflight as runPreflightLib,
 } from "./preflight.mjs";
+
+const whenAdapter = adapterTest(test);
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PREFLIGHT = join(HERE, "preflight.mjs");
@@ -45,7 +48,7 @@ function failedIds(report) {
   return [...new Set((report.checks ?? []).filter((check) => !check.passed).map((check) => check.id))];
 }
 
-test("good fixture passes the delivery spec", async () => {
+whenAdapter("good fixture passes the delivery spec", async () => {
   const { code, report, stderr } = await runPreflight("specs/good.json", "fixtures/good");
   assert.equal(stderr, "");
   assert.equal(code, 0);
@@ -54,13 +57,13 @@ test("good fixture passes the delivery spec", async () => {
   assert.deepEqual(report.summary.failedIds, []);
 });
 
-test("good-alt fixture still passes the same spec", async () => {
+whenAdapter("good-alt fixture still passes the same spec", async () => {
   const { code, report } = await runPreflight("specs/good.json", "fixtures/good-alt");
   assert.equal(code, 0);
   assert.equal(report.status, "pass");
 });
 
-test("wrong-size fixture fails width and height", async () => {
+whenAdapter("wrong-size fixture fails width and height", async () => {
   const { code, report } = await runPreflight("specs/good.json", "fixtures/bad/wrong-size");
   assert.equal(code, 1);
   assert.equal(report.status, "fail");
@@ -73,7 +76,7 @@ test("wrong-size fixture fails width and height", async () => {
   assert.equal(width.observed, 48);
 });
 
-test("wrong-format fixture fails format", async () => {
+whenAdapter("wrong-format fixture fails format", async () => {
   const { code, report } = await runPreflight("specs/good.json", "fixtures/bad/wrong-format");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -84,7 +87,7 @@ test("wrong-format fixture fails format", async () => {
   assert.equal(format.observed, "jpeg");
 });
 
-test("wrong-alpha fixture fails alpha", async () => {
+whenAdapter("wrong-alpha fixture fails alpha", async () => {
   const { code, report } = await runPreflight("specs/good.json", "fixtures/bad/wrong-alpha");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -95,7 +98,7 @@ test("wrong-alpha fixture fails alpha", async () => {
   assert.equal(alpha.observed, "present");
 });
 
-test("missing-slot fixture fails missing", async () => {
+whenAdapter("missing-slot fixture fails missing", async () => {
   const { code, report } = await runPreflight("specs/good.json", "fixtures/bad/missing-slot");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -105,7 +108,7 @@ test("missing-slot fixture fails missing", async () => {
   assert.equal(missing.passed, false);
 });
 
-test("extra-file fixture fails extra", async () => {
+whenAdapter("extra-file fixture fails extra", async () => {
   const { code, report } = await runPreflight("specs/good.json", "fixtures/bad/extra-file");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -114,7 +117,7 @@ test("extra-file fixture fails extra", async () => {
   assert.equal(extra.observed, "scratch-icon.png");
 });
 
-test("wrong-name on disk against the good spec is missing plus extra", async () => {
+whenAdapter("wrong-name on disk against the good spec is missing plus extra", async () => {
   const { code, report } = await runPreflight("specs/good.json", "fixtures/bad/wrong-name");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -122,7 +125,7 @@ test("wrong-name on disk against the good spec is missing plus extra", async () 
   assert.ok(ids.includes("extra"));
 });
 
-test("wrong-name spec against the renamed file fails name", async () => {
+whenAdapter("wrong-name spec against the renamed file fails name", async () => {
   const { code, report } = await runPreflight("specs/wrong-name.json", "fixtures/bad/wrong-name");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -133,7 +136,7 @@ test("wrong-name spec against the renamed file fails name", async () => {
   assert.equal(name.observed, "icon16.png");
 });
 
-test("changing expected height on the same good files flips pass to fail", async () => {
+whenAdapter("changing expected height on the same good files flips pass to fail", async () => {
   const good = await runPreflight("specs/good.json", "fixtures/good");
   const mutated = await runPreflight("specs/good-wrong-height.json", "fixtures/good");
   assert.equal(good.code, 0);
@@ -144,7 +147,7 @@ test("changing expected height on the same good files flips pass to fail", async
   assert.equal(height.observed, 360);
 });
 
-test("name-mismatch spec against good files fails name", async () => {
+whenAdapter("name-mismatch spec against good files fails name", async () => {
   const { code, report } = await runPreflight("specs/name-mismatch.json", "fixtures/good");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -241,7 +244,7 @@ async function withFakeAdapter(table, fn) {
   }
 }
 
-test("same-named file in workspaceRoot is ignored; delivery root is inspected", async () => {
+whenAdapter("same-named file in workspaceRoot is ignored; delivery root is inspected", async () => {
   const tmp = await mkdtemp(join(tmpdir(), "asset-delivery-preflight-path-"));
   const delivery = join(tmp, "delivery");
   await mkdir(delivery);

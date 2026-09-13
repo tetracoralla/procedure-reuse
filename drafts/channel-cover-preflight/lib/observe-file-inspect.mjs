@@ -266,7 +266,7 @@ export async function resolveAdapter(explicit, { projectRoot } = {}) {
     }
   }
   throw new Error(
-    `File Vitals JSONL adapter not found. Build it with scripts/build-file-vitals.sh (needs Go 1.26.6+). Looked at: ${candidates.join(", ") || "(none)"}`,
+    `File Vitals JSONL adapter not found. Clone the pinned File Vitals commit and run scripts/build-file-vitals.sh (docs/CLEAN_ENV.md). Looked at: ${candidates.join(", ") || "(none)"}`,
   );
 }
 

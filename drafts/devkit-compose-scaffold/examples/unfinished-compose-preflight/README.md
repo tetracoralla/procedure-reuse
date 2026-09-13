@@ -18,8 +18,9 @@ scripts/build-file-vitals.sh
 node --test src/preflight.test.mjs src/mcp-server.test.mjs
 scripts/run-procedure-conformance.sh
 # from workspace, Node 22 on PATH:
-node repos/agent-tool-development-kit/src/cli.mjs check --root . --json
-node repos/agent-tool-development-kit/src/cli.mjs pack --root . --json
+# From the procedure-reuse root after scripts/fetch-deps.sh --kit (docs/CLEAN_ENV.md):
+node .deps/agent-tool-development-kit/src/cli.mjs check --root drafts/devkit-compose-scaffold/examples/unfinished-compose-preflight --json
+node .deps/agent-tool-development-kit/src/cli.mjs pack --root drafts/devkit-compose-scaffold/examples/unfinished-compose-preflight --json
 ```
 
 Do not push, publish, or `agent-host component import` from this scaffold.

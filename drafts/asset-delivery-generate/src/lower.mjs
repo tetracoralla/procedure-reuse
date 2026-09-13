@@ -82,6 +82,6 @@ export async function resolveAdapter(explicit, projectRoot = PROJECT) {
     }
   }
   throw new Error(
-    `File Vitals JSONL adapter not found. Build it with drafts/asset-delivery-preflight/scripts/build-file-vitals.sh. Looked at: ${candidates.join(", ")}`,
+    `File Vitals JSONL adapter not found. Clone the pinned File Vitals commit and run scripts/build-file-vitals.sh (docs/CLEAN_ENV.md). Looked at: ${candidates.join(", ")}`,
   );
 }

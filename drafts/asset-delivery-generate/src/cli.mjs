@@ -112,7 +112,7 @@ export async function main(argv) {
     }
     await realpath(dirname(sourcePath));
     let adapter = null;
-    if (!args.generateOnly) {
+    if (args.adapter) {
       adapter = await resolveAdapter(args.adapter, PROJECT_ROOT);
     }
     const report = await runGenerateThenPreflight({

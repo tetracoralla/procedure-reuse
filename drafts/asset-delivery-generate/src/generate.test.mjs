@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { adapterTest } from "../../../scripts/lib/file-vitals-adapter.mjs";
 import { decodePng, encodePng, paintPattern } from "./png.mjs";
 import { GenerateFailure, runGenerate } from "./generate.mjs";
 import { loadLower } from "./lower.mjs";
@@ -19,6 +20,7 @@ const SOURCE_256 = join(PROJECT, "fixtures/source/master-256.png");
 const SOURCE_32 = join(PROJECT, "fixtures/source/too-small-32.png");
 const SPEC = join(PROJECT, "specs/icons.json");
 const SPEC_48 = join(PROJECT, "specs/icons-64-as-48.json");
+const whenAdapter = adapterTest(test);
 
 function sha256(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
@@ -67,7 +69,7 @@ test("png roundtrip preserves RGB/RGBA and dimensions", () => {
   assert.equal(decodedRgb.width, 10);
 });
 
-test("CLI good source generates four icons and preflight passes", async () => {
+whenAdapter("CLI good source generates four icons and preflight passes", async () => {
   const out = await tempOut("good");
   const before = sha256(await readFile(SOURCE_256));
   const { code, report, stderr } = await runCli([
@@ -126,7 +128,7 @@ test("too-small source fails at generate and does not write slots", async () => 
   assert.deepEqual(await readdir(out), []);
 });
 
-test("changing target width/height changes generated pixels and later preflight", async () => {
+whenAdapter("changing target width/height changes generated pixels and later preflight", async () => {
   const outA = await tempOut("spec-a");
   const outB = await tempOut("spec-b");
   const a = await runCli(["--source", SOURCE_256, "--spec", SPEC, "--out", outA, "--compact"]);
@@ -168,7 +170,7 @@ test("changing target width/height changes generated pixels and later preflight"
   assert.equal(againstMutated.status, "pass");
 });
 
-test("generate can succeed while reused preflight still fails (name mismatch)", async () => {
+whenAdapter("generate can succeed while reused preflight still fails (name mismatch)", async () => {
   const out = await tempOut("name");
   const lower = await loadLower();
   const spec = lower.loadSpec(await readFile(SPEC, "utf8"), SPEC);
@@ -217,7 +219,7 @@ test("unsupported JPEG slot fails at generate, not preflight", async () => {
   assert.equal(report.preflight, null);
 });
 
-test("refusing to overwrite existing slot files is a generate failure", async () => {
+whenAdapter("refusing to overwrite existing slot files is a generate failure", async () => {
   const out = await tempOut("exists");
   const first = await runCli(["--source", SOURCE_256, "--spec", SPEC, "--out", out, "--compact"]);
   assert.equal(first.code, 0);

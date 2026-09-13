@@ -6,13 +6,13 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { findWorkspace } from "../lib/workspace.mjs";
+import { resolveProcedureContractsSrc } from "../lib/workspace.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT = resolve(HERE, "..");
-const WORKSPACE = await findWorkspace(PROJECT);
+const PROCEDURE_CONTRACTS = await resolveProcedureContractsSrc(PROJECT);
 const { loadJson, procedureProfileDigest, resolveProcedureSchemas, schemaDigest } = await import(
-  pathToFileURL(join(WORKSPACE, "repos/procedure-contracts/src/lib/contracts.mjs")).href
+  pathToFileURL(join(PROCEDURE_CONTRACTS, "src/lib/contracts.mjs")).href
 );
 
 const profilePath = resolve(PROJECT, "procedure/profile.v0.1.json");

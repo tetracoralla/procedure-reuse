@@ -5,7 +5,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
+import { adapterTest } from "../../../scripts/lib/file-vitals-adapter.mjs";
 import { TOOL_NAME, callTool, handleMessage } from "./mcp-server.mjs";
+
+const whenAdapter = adapterTest(test);
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DRAFT = join(HERE, "..");
@@ -47,7 +50,7 @@ test("empty arguments are a protocol error, not a fake success", async () => {
   assert.match(response.error.message, /root|spec/i);
 });
 
-test("good delivery through MCP calls runPreflight and passes", async () => {
+whenAdapter("good delivery through MCP calls runPreflight and passes", async () => {
   await withGrant(async () => {
     const result = await callTool({
       name: TOOL_NAME,
@@ -62,7 +65,7 @@ test("good delivery through MCP calls runPreflight and passes", async () => {
   });
 });
 
-test("missing required slot is a successful fail report", async () => {
+whenAdapter("missing required slot is a successful fail report", async () => {
   await withGrant(async () => {
     const result = await callTool({
       name: TOOL_NAME,
@@ -110,7 +113,7 @@ function rpcSession(requests) {
   });
 }
 
-test("stdio initialize then tools/list then a real preflight call", async () => {
+whenAdapter("stdio initialize then tools/list then a real preflight call", async () => {
   const { messages, stderr, code } = await rpcSession([
     {
       jsonrpc: "2.0",

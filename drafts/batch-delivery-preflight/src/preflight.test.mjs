@@ -6,8 +6,11 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { adapterTest } from "../../../scripts/lib/file-vitals-adapter.mjs";
 import { runPreflight } from "./preflight.mjs";
 import { parseSpec } from "./spec.mjs";
+
+const whenAdapter = adapterTest(test);
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT = join(HERE, "..");
@@ -46,7 +49,7 @@ function failedChecks(report) {
   return (report.checks ?? []).filter((check) => !check.passed);
 }
 
-test("good two-kit campaign passes", async () => {
+whenAdapter("good two-kit campaign passes", async () => {
   const { code, report, stderr } = await runCli("specs/good.json", "fixtures/good");
   assert.equal(stderr, "");
   assert.equal(code, 0);
@@ -72,7 +75,7 @@ test("good two-kit campaign passes", async () => {
   );
 });
 
-test("missing required cover kit fails and names the kit", async () => {
+whenAdapter("missing required cover kit fails and names the kit", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/missing-covers");
   assert.equal(code, 1);
   assert.equal(report.status, "fail");
@@ -86,7 +89,7 @@ test("missing required cover kit fails and names the kit", async () => {
   assert.equal(kitById(report, "icons").status, "pass");
 });
 
-test("wrong icon-64 size fails the batch and localizes kit/slot/check", async () => {
+whenAdapter("wrong icon-64 size fails the batch and localizes kit/slot/check", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/icons-wrong-size");
   assert.equal(code, 1);
   assert.equal(report.status, "fail");
@@ -104,7 +107,7 @@ test("wrong icon-64 size fails the batch and localizes kit/slot/check", async ()
   assert.ok(report.summary.failedIds.includes("height"));
 });
 
-test("dropping the failing kit from the campaign list flips fail to pass", async () => {
+whenAdapter("dropping the failing kit from the campaign list flips fail to pass", async () => {
   const twoKit = await runCli("specs/good.json", "fixtures/icons-wrong-size");
   const coversOnly = await runCli("specs/covers-only.json", "fixtures/icons-wrong-size");
   assert.equal(twoKit.code, 1);
@@ -118,7 +121,7 @@ test("dropping the failing kit from the campaign list flips fail to pass", async
   assert.equal(kitById(coversOnly.report, "covers").status, "pass");
 });
 
-test("changing the lower icon height spec on the same good files flips pass to fail", async () => {
+whenAdapter("changing the lower icon height spec on the same good files flips pass to fail", async () => {
   const good = await runCli("specs/good.json", "fixtures/good");
   const mutated = await runCli("specs/icons-wrong-height.json", "fixtures/good");
   assert.equal(good.code, 0);
@@ -133,7 +136,7 @@ test("changing the lower icon height spec on the same good files flips pass to f
   assert.equal(kitById(mutated.report, "covers").status, "pass");
 });
 
-test("each lower inspect grant is the kit root, not the campaign root", async () => {
+whenAdapter("each lower inspect grant is the kit root, not the campaign root", async () => {
   const { report } = await runCli("specs/good.json", "fixtures/good");
   const icons = kitById(report, "icons");
   const covers = kitById(report, "covers");
@@ -217,7 +220,7 @@ test("kit symlink pointing outside the campaign grant is rejected", async () => 
   );
 });
 
-test("loaded method identity includes the resolved module path", async () => {
+whenAdapter("loaded method identity includes the resolved module path", async () => {
   const { report } = await runCli("specs/good.json", "fixtures/good");
   const icons = kitById(report, "icons");
   assert.equal(icons.method.implementation, "org.openadam.asset-delivery-preflight@0.1.0");

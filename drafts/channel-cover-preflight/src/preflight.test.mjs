@@ -6,8 +6,11 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { adapterTest } from "../../../scripts/lib/file-vitals-adapter.mjs";
 import { inspectPathForGrant, resolveAdapter } from "../lib/observe-file-inspect.mjs";
 import { loadSpec, runPreflight as runPreflightLib } from "./preflight.mjs";
+
+const whenAdapter = adapterTest(test);
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT = join(HERE, "..");
@@ -42,7 +45,7 @@ function failedIds(report) {
   return [...new Set((report.checks ?? []).filter((check) => !check.passed).map((check) => check.id))];
 }
 
-test("good fixture passes the channel-cover spec including absent optional 4x5", async () => {
+whenAdapter("good fixture passes the channel-cover spec including absent optional 4x5", async () => {
   const { code, report, stderr } = await runCli("specs/good.json", "fixtures/good");
   assert.equal(stderr, "");
   assert.equal(code, 0);
@@ -56,13 +59,13 @@ test("good fixture passes the channel-cover spec including absent optional 4x5",
   assert.match(report.observer.note, /not raster.verify/i);
 });
 
-test("good-alt still passes the same spec", async () => {
+whenAdapter("good-alt still passes the same spec", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/good-alt");
   assert.equal(code, 0);
   assert.equal(report.status, "pass");
 });
 
-test("wrong-size 16x9 fails height and aspect", async () => {
+whenAdapter("wrong-size 16x9 fails height and aspect", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/bad/wrong-size");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -77,7 +80,7 @@ test("wrong-size 16x9 fails height and aspect", async () => {
   assert.equal(aspect.observed, "2:1");
 });
 
-test("wrong-format 16x9 (PNG bytes named .jpg) fails format", async () => {
+whenAdapter("wrong-format 16x9 (PNG bytes named .jpg) fails format", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/bad/wrong-format");
   assert.equal(code, 1);
   const format = report.checks.find((check) => !check.passed && check.id === "format");
@@ -86,7 +89,7 @@ test("wrong-format 16x9 (PNG bytes named .jpg) fails format", async () => {
   assert.equal(format.observed, "png");
 });
 
-test("transparent 1x1 fails transparency when not allowed", async () => {
+whenAdapter("transparent 1x1 fails transparency when not allowed", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/bad/transparent");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -97,7 +100,7 @@ test("transparent 1x1 fails transparency when not allowed", async () => {
   assert.equal(alpha.observed, "present");
 });
 
-test("same transparent fixture passes when the spec allows transparency", async () => {
+whenAdapter("same transparent fixture passes when the spec allows transparency", async () => {
   const forbidden = await runCli("specs/good.json", "fixtures/bad/transparent");
   const allowed = await runCli("specs/transparency-allowed.json", "fixtures/bad/transparent");
   assert.equal(forbidden.code, 1);
@@ -105,7 +108,7 @@ test("same transparent fixture passes when the spec allows transparency", async 
   assert.equal(allowed.report.status, "pass");
 });
 
-test("missing required 9x16 fails missing; optional 4x5 absence is not missing", async () => {
+whenAdapter("missing required 9x16 fails missing; optional 4x5 absence is not missing", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/bad/missing-slot");
   assert.equal(code, 1);
   assert.deepEqual(failedIds(report), ["missing"]);
@@ -113,7 +116,7 @@ test("missing required 9x16 fails missing; optional 4x5 absence is not missing",
   assert.equal(missing.slot, "cover-9x16");
 });
 
-test("extra undeclared file fails extra", async () => {
+whenAdapter("extra undeclared file fails extra", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/bad/extra-file");
   assert.equal(code, 1);
   assert.deepEqual(failedIds(report), ["extra"]);
@@ -121,7 +124,7 @@ test("extra undeclared file fails extra", async () => {
   assert.equal(extra.observed, "covers/scratch-cover.png");
 });
 
-test("wrong-name on disk against the good spec is missing plus extra", async () => {
+whenAdapter("wrong-name on disk against the good spec is missing plus extra", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/bad/wrong-name");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -129,7 +132,7 @@ test("wrong-name on disk against the good spec is missing plus extra", async () 
   assert.ok(ids.includes("extra"));
 });
 
-test("changing expected width on the same good files flips pass to fail", async () => {
+whenAdapter("changing expected width on the same good files flips pass to fail", async () => {
   const good = await runCli("specs/good.json", "fixtures/good");
   const mutated = await runCli("specs/good-wrong-width.json", "fixtures/good");
   assert.equal(good.code, 0);
@@ -140,7 +143,7 @@ test("changing expected width on the same good files flips pass to fail", async 
   assert.equal(width.observed, 64);
 });
 
-test("changing expected aspect on the same good files fails only aspect", async () => {
+whenAdapter("changing expected aspect on the same good files fails only aspect", async () => {
   const mutated = await runCli("specs/good-wrong-aspect.json", "fixtures/good");
   assert.equal(mutated.code, 1);
   assert.deepEqual(failedIds(mutated.report), ["aspect"]);
@@ -150,13 +153,13 @@ test("changing expected aspect on the same good files fails only aspect", async 
   assert.equal(aspect.observed, "16:9");
 });
 
-test("changing naming.pattern on the same good files fails namePattern", async () => {
+whenAdapter("changing naming.pattern on the same good files fails namePattern", async () => {
   const mutated = await runCli("specs/good-wrong-pattern.json", "fixtures/good");
   assert.equal(mutated.code, 1);
   assert.deepEqual(failedIds(mutated.report), ["namePattern"]);
 });
 
-test("wrong-aspect fixture (160x100) fails height and aspect", async () => {
+whenAdapter("wrong-aspect fixture (160x100) fails height and aspect", async () => {
   const { code, report } = await runCli("specs/good.json", "fixtures/bad/wrong-aspect");
   assert.equal(code, 1);
   const ids = failedIds(report);
@@ -174,7 +177,7 @@ test("inspect path is relative to the delivery root, not a parent workspace gran
   );
 });
 
-test("same-named cover in workspaceRoot is ignored; delivery root is inspected", async () => {
+whenAdapter("same-named cover in workspaceRoot is ignored; delivery root is inspected", async () => {
   const tmp = await mkdtemp(join(tmpdir(), "channel-cover-path-"));
   const delivery = join(tmp, "delivery");
   await mkdir(join(delivery, "covers"), { recursive: true });

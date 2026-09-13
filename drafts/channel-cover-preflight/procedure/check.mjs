@@ -2,14 +2,20 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { findWorkspace } from "../lib/workspace.mjs";
+import {
+  resolveCapabilityContractsSrc,
+  resolveFileVitalsSrc,
+  resolveProcedureContractsSrc,
+} from "../lib/workspace.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT = resolve(HERE, "..");
-const WORKSPACE = await findWorkspace(PROJECT);
-const contractsHref = pathToFileURL(join(WORKSPACE, "repos/procedure-contracts/src/lib/contracts.mjs")).href;
-const refsHref = pathToFileURL(join(WORKSPACE, "repos/procedure-contracts/src/lib/capability-references.mjs")).href;
-const bindingsHref = pathToFileURL(join(WORKSPACE, "repos/procedure-contracts/src/lib/stage-bindings.mjs")).href;
+const PROCEDURE_CONTRACTS = await resolveProcedureContractsSrc(PROJECT);
+const CAPABILITY_CONTRACTS = await resolveCapabilityContractsSrc(PROJECT);
+const FILE_VITALS = await resolveFileVitalsSrc(PROJECT);
+const contractsHref = pathToFileURL(join(PROCEDURE_CONTRACTS, "src/lib/contracts.mjs")).href;
+const refsHref = pathToFileURL(join(PROCEDURE_CONTRACTS, "src/lib/capability-references.mjs")).href;
+const bindingsHref = pathToFileURL(join(PROCEDURE_CONTRACTS, "src/lib/stage-bindings.mjs")).href;
 const {
   loadJson,
   parseJson,
@@ -24,8 +30,8 @@ const { validateStageProviderBindings } = await import(bindingsHref);
 const profilePath = resolve(HERE, "profile.v0.1.json");
 const suitePath = resolve(HERE, "conformance.v0.1.json");
 const manifestPath = resolve(HERE, "implementation-manifest.json");
-const capabilityCatalog = resolve(WORKSPACE, "repos/capability-contracts/catalog/capabilities");
-const fileVitalsManifest = resolve(WORKSPACE, "repos/file-vitals/capabilities/provider.json");
+const capabilityCatalog = resolve(CAPABILITY_CONTRACTS, "catalog/capabilities");
+const fileVitalsManifest = resolve(FILE_VITALS, "capabilities/provider.json");
 
 async function readCatalogFiles(root, label) {
   const entries = (await readdir(root, { withFileTypes: true }))

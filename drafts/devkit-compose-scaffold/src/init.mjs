@@ -2,8 +2,8 @@ import { lstat, mkdir, mkdtemp, readFile, readdir, rename, rm, stat, writeFile }
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
-import { validateProjectDocument, loadProject } from "../../../repos/agent-tool-development-kit/src/contracts.mjs";
 import { ComposeScaffoldError } from "./errors.mjs";
+import { loadProject, validateProjectDocument } from "./project-document.mjs";
 
 const templatesRoot = fileURLToPath(new URL("../templates", import.meta.url));
 export const SUPPORTED_TEMPLATES = new Set(["compose-procedure-preflight"]);
@@ -208,7 +208,7 @@ async function materialize(plan) {
     const digest = await runNode("scripts/write-procedure-digests.mjs", staging);
     if (digest.code !== 0) {
       const message = `${digest.stderr}\n${digest.stdout}`.trim();
-      if (!/Could not find the workspace root/i.test(message)) {
+      if (!/Could not find the workspace root|source not found|CLEAN_ENV/i.test(message)) {
         throw new ComposeScaffoldError(
           "DIGEST_WRITE_FAILED",
           `Could not write Procedure digests: ${message || `exit ${digest.code}`}`,

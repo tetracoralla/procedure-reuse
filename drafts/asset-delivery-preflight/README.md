@@ -57,18 +57,20 @@
 
 ## 依赖
 
-- Node.js 18+（本机示例入口是 `node preflight.mjs`；不需要改 Host，也不要求契约仓的 Node 22）
-- 构建 File Vitals：Go **1.26.6+**（`repos/file-vitals/go.mod`）。本工作区可把工具链放在 `/.tools/go`
+- Node.js 18+ for `node preflight.mjs`; Node 22 for procedure-contracts / Kit pack
+- File Vitals: official clone at the commit in `deps/pins.json`, Go **1.26.6+** from https://go.dev/dl/. See [`docs/CLEAN_ENV.md`](../../docs/CLEAN_ENV.md). Do not assume author `repos/file-vitals` or `.tools/go`.
 - 重新生成夹具：Python 3 + `ffmpeg`（JPEG 坏例）。已生成的 PNG/JPEG 可直接用
 
-不安装 npm 依赖。不改 `repos/` 源码，不改 Host。
+不安装 npm 依赖。不改 Host。
 
 ## 构建观察层
 
-在工作根 `/workspace/openadam-procedure-reuse/`：
+From the repository root:
 
 ```bash
-drafts/asset-delivery-preflight/scripts/build-file-vitals.sh
+sh scripts/fetch-deps.sh --file-vitals
+sh scripts/build-file-vitals.sh --all-drafts
+# or: FILE_VITALS_SRC=/path/to/pinned-file-vitals sh drafts/asset-delivery-preflight/scripts/build-file-vitals.sh
 ```
 
 写出：
@@ -157,13 +159,14 @@ scaffold and does not return `CORE_NOT_IMPLEMENTED`. Pack stages the File
 Vitals JSONL adapter plus the combinator. The package command writes only to
 `OPENADAM_COMPONENT_STAGE`; Kit seals `component.json` and the archive.
 
-From the workspace root, with Node 22 on PATH (`.tools/node`):
+From the workspace root, with Node 22 on PATH (see `docs/CLEAN_ENV.md`; not `.tools/node`):
 
 ```bash
-export PATH="$PWD/.tools/node/bin:$PATH"
-node repos/agent-tool-development-kit/src/cli.mjs check \
+sh scripts/fetch-deps.sh --kit --file-vitals
+sh scripts/build-file-vitals.sh --all-drafts
+node .deps/agent-tool-development-kit/src/cli.mjs check \
   --root drafts/asset-delivery-preflight --json
-node repos/agent-tool-development-kit/src/cli.mjs pack \
+node .deps/agent-tool-development-kit/src/cli.mjs pack \
   --root drafts/asset-delivery-preflight --json
 ```
 

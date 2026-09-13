@@ -8,32 +8,39 @@
  */
 
 import { readdir, readFile, stat } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { validateCapabilityReferences } from "../../../repos/procedure-contracts/src/lib/capability-references.mjs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import {
+  resolveCapabilityContractsSrc,
+  resolveFileVitalsSrc,
+  resolveProcedureContractsSrc,
+} from "../lib/workspace.mjs";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const PROJECT = resolve(HERE, "..");
+const PROCEDURE_CONTRACTS = await resolveProcedureContractsSrc(PROJECT);
+const CAPABILITY_CONTRACTS = await resolveCapabilityContractsSrc(PROJECT);
+const FILE_VITALS = await resolveFileVitalsSrc(PROJECT);
+const {
   loadJson,
   parseJson,
   procedureProfileDigest,
   resolveProcedureSchemas,
   schemaDigest,
   validateContractSet,
-} from "../../../repos/procedure-contracts/src/lib/contracts.mjs";
-import { validateStageProviderBindings } from "../../../repos/procedure-contracts/src/lib/stage-bindings.mjs";
+} = await import(pathToFileURL(join(PROCEDURE_CONTRACTS, "src/lib/contracts.mjs")).href);
+const { validateCapabilityReferences } = await import(
+  pathToFileURL(join(PROCEDURE_CONTRACTS, "src/lib/capability-references.mjs")).href
+);
+const { validateStageProviderBindings } = await import(
+  pathToFileURL(join(PROCEDURE_CONTRACTS, "src/lib/stage-bindings.mjs")).href
+);
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const WORKSPACE = resolve(HERE, "../../..");
 const profilePath = resolve(HERE, "asset-delivery-preflight.v0.1.json");
 const suitePath = resolve(HERE, "conformance.v0.1.json");
 const manifestPath = resolve(HERE, "implementation-manifest.json");
-const capabilityCatalog = resolve(
-  WORKSPACE,
-  "repos/capability-contracts/catalog/capabilities",
-);
-const fileVitalsManifest = resolve(
-  WORKSPACE,
-  "repos/file-vitals/capabilities/provider.json",
-);
+const capabilityCatalog = resolve(CAPABILITY_CONTRACTS, "catalog/capabilities");
+const fileVitalsManifest = resolve(FILE_VITALS, "capabilities/provider.json");
 
 async function readCatalogFiles(root, label) {
   const entries = (await readdir(root, { withFileTypes: true }))

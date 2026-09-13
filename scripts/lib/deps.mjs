@@ -1,10 +1,15 @@
 /**
- * Resolve pinned public dependency checkouts for authoring-time scripts.
- * Env vars win. Otherwise .deps/ next to deps/pins.json.
- * Does not assume an author repos/ tree.
+ * Resolve pinned public dependency checkouts.
+ * Env vars win. Otherwise use gitignored .deps/ next to deps/pins.json.
+ * Does not walk an author repos/ tree.
  */
 import { dirname, join, resolve } from "node:path";
-import { stat } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+
+const THIS_DIR = dirname(fileURLToPath(import.meta.url));
+export const SCRIPTS_ROOT = resolve(THIS_DIR, "..");
+export const DEFAULT_REPO_ROOT = resolve(SCRIPTS_ROOT, "..");
 
 async function isDir(path) {
   try {
@@ -22,7 +27,7 @@ async function isFile(path) {
   }
 }
 
-export async function findPinsRoot(start) {
+export async function findPinsRoot(start = DEFAULT_REPO_ROOT) {
   let current = resolve(start);
   while (true) {
     if (await isFile(join(current, "deps", "pins.json"))) {
@@ -34,6 +39,17 @@ export async function findPinsRoot(start) {
     }
     current = parent;
   }
+}
+
+export async function loadPins(start = DEFAULT_REPO_ROOT) {
+  const root = await findPinsRoot(start);
+  if (root === null) {
+    throw new Error("deps/pins.json was not found. Run from a procedure-reuse checkout (docs/CLEAN_ENV.md).");
+  }
+  return {
+    root,
+    pins: JSON.parse(await readFile(join(root, "deps", "pins.json"), "utf8")),
+  };
 }
 
 async function resolveDep(start, { envKeys, dirName, label }) {
@@ -59,7 +75,7 @@ async function resolveDep(start, { envKeys, dirName, label }) {
   );
 }
 
-export async function resolveFileVitalsSrc(start) {
+export async function resolveFileVitalsSrc(start = DEFAULT_REPO_ROOT) {
   return resolveDep(start, {
     envKeys: ["FILE_VITALS_SRC", "OPENADAM_FILE_VITALS_SOURCE_ROOT"],
     dirName: "file-vitals",
@@ -67,7 +83,7 @@ export async function resolveFileVitalsSrc(start) {
   });
 }
 
-export async function resolveProcedureContractsSrc(start) {
+export async function resolveProcedureContractsSrc(start = DEFAULT_REPO_ROOT) {
   return resolveDep(start, {
     envKeys: ["PROCEDURE_CONTRACTS_SRC"],
     dirName: "procedure-contracts",
@@ -75,7 +91,7 @@ export async function resolveProcedureContractsSrc(start) {
   });
 }
 
-export async function resolveCapabilityContractsSrc(start) {
+export async function resolveCapabilityContractsSrc(start = DEFAULT_REPO_ROOT) {
   return resolveDep(start, {
     envKeys: ["CAPABILITY_CONTRACTS_SRC"],
     dirName: "capability-contracts",
@@ -83,13 +99,10 @@ export async function resolveCapabilityContractsSrc(start) {
   });
 }
 
-/** @deprecated Use resolve*Src. Kept so missing-contracts init still matches a clear error. */
-export async function findWorkspace(start) {
-  const root = await findPinsRoot(start);
-  if (root !== null) {
-    return root;
-  }
-  throw new Error(
-    "Could not find the workspace root (deps/pins.json). Set FILE_VITALS_SRC / PROCEDURE_CONTRACTS_SRC. See docs/CLEAN_ENV.md.",
-  );
+export async function resolveDevkitSrc(start = DEFAULT_REPO_ROOT) {
+  return resolveDep(start, {
+    envKeys: ["OPENADAM_DEVKIT_ROOT"],
+    dirName: "agent-tool-development-kit",
+    label: "Agent Tool Development Kit",
+  });
 }

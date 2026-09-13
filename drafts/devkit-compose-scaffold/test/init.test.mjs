@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import { access, mkdtemp, readFile, readdir, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { initProject } from "../src/init.mjs";
 import { ComposeScaffoldError } from "../src/errors.mjs";
-import { loadProject } from "../../../repos/agent-tool-development-kit/src/contracts.mjs";
+import { loadProject } from "../src/project-document.mjs";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 function options(parent, overrides = {}) {
   return {
@@ -80,4 +83,10 @@ test("rejects an unknown template", async () => {
     initProject(options(parent, { template: "node-mcp-provider" })),
     (error) => error instanceof ComposeScaffoldError && error.code === "TEMPLATE_UNSUPPORTED",
   );
+});
+
+test("init source does not import an author Kit checkout path", async () => {
+  const src = await readFile(join(HERE, "../src/init.mjs"), "utf8");
+  assert.equal(src.includes("repos/agent-tool-development-kit"), false);
+  assert.equal(src.includes("validateProjectDocument"), true);
 });

@@ -1,5 +1,7 @@
 #!/bin/sh
-# Install Node 22+ into the workspace toolchain at .tools/node. Does not modify Host.
+# Optional helper: install Node 22+ into .tools/node from nodejs.org official dist.
+# Clean-environment checks use Node 22 on PATH (docs/CLEAN_ENV.md).
+# Do not treat .tools/node as required.
 set -eu
 ROOT="$(CDPATH= cd -- "$(dirname "$0")/../../.." && pwd)"
 NODE_DIR="$ROOT/.tools/node"
@@ -15,6 +17,15 @@ case "$ARCH" in
 esac
 
 node_ok() {
+  if command -v node >/dev/null 2>&1; then
+    found="$(node -v 2>/dev/null || true)"
+    case "$found" in
+      v22.*|v23.*|v24.*|v2[5-9].*)
+        echo "using PATH node $found ($(command -v node))"
+        return 0
+        ;;
+    esac
+  fi
   if [ -x "$NODE_DIR/bin/node" ]; then
     found="$("$NODE_DIR/bin/node" -v 2>/dev/null || true)"
     case "$found" in
@@ -24,9 +35,23 @@ node_ok() {
   return 1
 }
 
-if node_ok; then
-  echo "$NODE_DIR/bin/node ($("$NODE_DIR/bin/node" -v))"
-  exit 0
+if command -v node >/dev/null 2>&1; then
+  found="$(node -v 2>/dev/null || true)"
+  case "$found" in
+    v22.*|v23.*|v24.*|v2[5-9].*)
+      echo "using PATH node $found ($(command -v node))"
+      exit 0
+      ;;
+  esac
+fi
+if [ -x "$NODE_DIR/bin/node" ]; then
+  found="$("$NODE_DIR/bin/node" -v 2>/dev/null || true)"
+  case "$found" in
+    v22.*|v23.*|v24.*|v2[5-9].*)
+      echo "$NODE_DIR/bin/node ($found)"
+      exit 0
+      ;;
+  esac
 fi
 
 TARBALL="node-${VERSION}-linux-${NODE_ARCH}.tar.gz"
