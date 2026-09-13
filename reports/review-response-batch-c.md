@@ -3,6 +3,7 @@
 Date: 2026-09-13  
 On branch: `review/asset-delivery-methods` (includes Batch A + B)  
 Commit: [`ba9ca9b`](https://github.com/tetracoralla/procedure-reuse/commit/ba9ca9b1ec4476ed88cc57a5155d1f986cbf6ff9)  
+PR: https://github.com/tetracoralla/procedure-reuse/pull/1 (open, not merged)  
 This round: one delivery job with written acceptance; usage and light authoring from HANDOFF / CLEAN_ENV / README; a naive-script comparison.  
 Not this round: a sixth method product, Host changes, format expansion, merge, visibility/history edits, a claim that an independent third party took the handoff.
 
