@@ -2,6 +2,7 @@
 
 Date: 2026-09-13  
 On branch: `review/asset-delivery-methods` (includes Batch A)  
+Commit: [`060c124`](https://github.com/tetracoralla/procedure-reuse/commit/060c12448112bb678fb5aca5d57b5abbe3d15a4f)  
 Platform documented: Linux x64 + Node 22  
 This round: Batch B only.  
 Not this round: Batch C real-user Agent task (plan only), sixth method, Host merge, visibility/history changes, force-push.
@@ -77,7 +78,7 @@ Local fetch of the pin succeeded (`53ed0ac412e1821bf068c87e4ff7aae899c49347`). T
 
 ## CI run
 
-Pushed this commit to `origin/review/asset-delivery-methods`.
+Pushed [`060c124`](https://github.com/tetracoralla/procedure-reuse/commit/060c12448112bb678fb5aca5d57b5abbe3d15a4f) to `origin/review/asset-delivery-methods`. PR: https://github.com/tetracoralla/procedure-reuse/pull/1
 
 GitHub refused to store `.github/workflows/ci.yml` because the `gh` OAuth
 token here has scopes `gist, read:org, repo` and **not** `workflow`. The
