@@ -3,6 +3,9 @@
  *
  * Slot comparison (name / format / width / height / alpha / missing / extra)
  * stays in that module. This draft only imports runPreflight / parseSpec.
+ *
+ * There is no packed deps/ payload for this generate draft. The sibling
+ * combinator path is the only binding; the resolved file is reported.
  */
 import { access, stat } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
@@ -21,26 +24,30 @@ export const LOWER = {
 
 let loaded = null;
 
-async function importFirst(candidates, label) {
-  const errors = [];
-  for (const candidate of candidates) {
-    try {
-      await access(candidate);
-      return await import(pathToFileURL(candidate).href);
-    } catch (error) {
-      errors.push(`${candidate}: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-  throw new Error(`${label} combinator not found. Looked at: ${errors.join("; ")}`);
+export function resetLowerCache() {
+  loaded = null;
 }
 
 export async function loadLower() {
   if (loaded) {
     return loaded;
   }
-  const module = await importFirst(LOWER.moduleCandidates, LOWER.implementation);
+  const candidate = LOWER.moduleCandidates[0];
+  try {
+    await access(candidate);
+  } catch (error) {
+    throw new Error(`${LOWER.implementation} combinator not found: ${candidate}`);
+  }
+  let module;
+  try {
+    module = await import(pathToFileURL(candidate).href);
+  } catch (error) {
+    throw new Error(
+      `${LOWER.implementation} failed to load ${candidate}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
   if (typeof module.runPreflight !== "function" || typeof module.parseSpec !== "function") {
-    throw new Error(`${LOWER.implementation} does not export runPreflight/parseSpec`);
+    throw new Error(`${LOWER.implementation} does not export runPreflight/parseSpec (loaded ${candidate})`);
   }
   loaded = {
     ...LOWER,
@@ -48,6 +55,8 @@ export async function loadLower() {
     parseSpec: module.parseSpec,
     loadSpec: module.loadSpec,
     resolveAdapter: module.resolveAdapter,
+    resolvedPath: candidate,
+    bindingMode: "sibling-draft",
   };
   return loaded;
 }

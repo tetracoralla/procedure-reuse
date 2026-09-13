@@ -29,6 +29,11 @@ Suite checks stay in ordinary code. This does **not** implement
 Experimental draft. Public Host catalogs were not updated. No Host import.
 Binaries and sealed packs are rebuilt locally (see each draft README).
 
+This tree does **not** claim the Procedure authoring-and-reuse program is
+done. M4 is a handoff drill, not an independent third-party handoff. M5 is
+a narrow PNG generate+preflight slice; write-boundary and image fixes from
+review Batch A are in `reports/review-response-batch-a.md`.
+
 ## License
 
 Apache License 2.0. See `LICENSE` and `NOTICE`.

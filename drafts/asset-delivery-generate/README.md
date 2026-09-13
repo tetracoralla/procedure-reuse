@@ -2,7 +2,7 @@
 
 检查输入 → **生成所需版本** → 检查输出 → 交付。本目录只做有边界的第二段：**一张源 PNG → 图标套装多尺寸**，写到**新目录**，再调用已有预检。
 
-不是 `brand-asset.prepare`，不是 `raster.prepare`，不绑定未公开的 `asset-prep`。缩放是普通 PNG 代码（cover 裁切、禁止放大）。对照规则仍在 `../asset-delivery-preflight/` 的 `runPreflight`，这里不复制。
+不是 `brand-asset.prepare`，不是 `raster.prepare`，不绑定未公开的 `asset-prep`。解码/编码用 vendored pngjs；缩小是预乘 alpha 的面积盒式滤波（cover 裁切、禁止放大）。对照规则仍在 `../asset-delivery-preflight/` 的 `runPreflight`，这里不复制。
 
 预检、整批战役、外人入口仍从
 [`../batch-delivery-preflight/HANDOFF.md`](../batch-delivery-preflight/HANDOFF.md)
@@ -14,9 +14,10 @@
 
 - 读一份 asset-delivery 槽位规格（宽高 / 格式 / 命名 / alpha）
 - 从一张源 PNG 生成各 PNG 槽位到 `--out`
-- 默认不改源文件、不覆盖已有槽位文件
+- 默认不改源文件（含符号链接/硬链接别名），不覆盖已有槽位文件（执行时 `O_EXCL`，不是只做事前 access）
+- 输出根和中间路径上的符号链接不能把写入扩到 `--out` 之外
 - 生成成功后再跑 `asset-delivery-preflight`
-- 任一**必需**槽无法生成（源太小、缺 alpha、非 PNG 等）则整次失败，不写部分文件
+- 规格阶段失败（源太小、缺 alpha、非 PNG 等）不写槽位。写入过程中途 I/O 失败会报告已经落下的文件（`output.partial`），不假装全有全无
 
 不做：
 
@@ -77,7 +78,7 @@ JSON 里先看 `stage`，再看 `status`。
 
 ```bash
 node scripts/write-source-fixtures.mjs   # 已提交的夹具；改图案时再跑
-node --test src/generate.test.mjs
+node --test src/png.test.mjs src/generate.test.mjs
 ```
 
 ## 明确不是什么

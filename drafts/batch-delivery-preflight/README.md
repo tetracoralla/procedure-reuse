@@ -18,6 +18,16 @@ to **kit / slot / check**. Observation is still
 `org.openadam.file.inspect@0.1.0`. **Not** `raster.verify`. **Not** Direct
 Runtime nesting.
 
+Kit roots and kit spec paths are resolved, then required to stay inside the
+original campaign/workspace grant. A kit directory that is a symlink out of
+that grant is rejected; the lower combinator never receives the escaped
+realpath as a new File Vitals grant.
+
+Packed `deps/` is the production binding. A broken packed module does not
+silently load a sibling checkout. Authoring trees without `deps/` load the
+sibling draft and report `method.resolvedPath` / `bindingMode`. An explicit
+fallback from a broken packed module requires `OPENADAM_DRAFT_DEV_BINDINGS=1`.
+
 ```bash
 scripts/build-file-vitals.sh
 node src/cli.mjs --spec specs/good.json --root fixtures/good --compact

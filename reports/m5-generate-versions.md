@@ -6,6 +6,8 @@
 预检复用：`drafts/asset-delivery-preflight/` 的 `runPreflight` / `parseSpec`  
 约束：不改 Host；不 `component import`；不 push；不改公开 catalog；不宣称 `raster.prepare` / `brand-asset.prepare` / `asset-prep`。
 
+**完成度重标（Batch A，2026-09-13）：M5 是窄 PNG 生成与复检切片，不是制作方案完成。** 先修写入边界与图像正确性（见 `reports/review-response-batch-a.md`），再谈加深格式、Kit 打包或公开 `raster.prepare`。不得把 M5 当成交付链已完成。
+
 结论先行：
 
 1. **交付链第二段补上了「按槽位写出」**，范围收在图标 PNG 套装：一张源图 + 目标宽高/格式/命名 → 新目录写出 16/32/64/128，再跑已有预检。

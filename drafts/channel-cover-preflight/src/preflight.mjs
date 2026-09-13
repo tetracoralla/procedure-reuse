@@ -5,24 +5,47 @@
  * Missing required slots and extra files are recorded here.
  * Present-file comparison is author-owned (`src/compare.mjs`).
  */
+import { isAbsolute, relative, resolve, sep } from "node:path";
 import { checkRecord } from "../lib/check-record.mjs";
 import { listRegularFiles } from "../lib/list-delivery-files.mjs";
-import { inspectAll, observationFields, OBSERVER } from "../lib/observe-file-inspect.mjs";
+import {
+  inspectAll,
+  inspectPathForGrant,
+  observationFields,
+  observationQualityChecks,
+  OBSERVER,
+} from "../lib/observe-file-inspect.mjs";
 import { compareSlot, extraFiles } from "./compare.mjs";
 
 export { parseSpec, loadSpec } from "./spec.mjs";
 
+function isOutside(root, candidate) {
+  const relativePath = relative(root, candidate);
+  return relativePath === ".." || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath);
+}
+
 export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
-  const diskFiles = await listRegularFiles(root);
+  const deliveryRoot = resolve(root);
+  const inspectGrant = resolve(workspaceRoot ?? deliveryRoot);
+  if (isOutside(inspectGrant, deliveryRoot)) {
+    throw new Error(`delivery root is outside the inspect grant: ${deliveryRoot}`);
+  }
+  const diskFiles = await listRegularFiles(deliveryRoot);
   const diskSet = new Set(diskFiles);
   const declaredPaths = new Set(spec.slots.map((slot) => slot.path));
-  const inspectPaths = spec.slots.filter((slot) => diskSet.has(slot.path)).map((slot) => slot.path);
+  const inspectBySlot = new Map();
+  for (const slot of spec.slots) {
+    if (diskSet.has(slot.path)) {
+      inspectBySlot.set(slot.path, inspectPathForGrant(inspectGrant, deliveryRoot, slot.path));
+    }
+  }
+  const inspectPaths = [...new Set(inspectBySlot.values())];
   if (inspectPaths.length > 0 && !adapter) {
     throw new Error("File Vitals JSONL adapter is required when declared files are present.");
   }
   const responses = inspectPaths.length === 0
     ? new Map()
-    : await inspectAll(adapter, workspaceRoot, inspectPaths);
+    : await inspectAll(adapter, inspectGrant, inspectPaths);
 
   const checks = [];
   const slots = [];
@@ -46,7 +69,11 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
       }
       continue;
     }
-    const observed = observationFields(responses.get(slot.path));
+    const inspectPath = inspectBySlot.get(slot.path);
+    const response = responses.get(inspectPath);
+    const quality = observationQualityChecks(slot, response);
+    checks.push(...quality.checks);
+    const observed = observationFields(response);
     const compared = compareSlot(slot, observed, spec);
     if (!Array.isArray(compared)) {
       throw new Error("compareSlot must return an array of check records");
@@ -58,6 +85,9 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
       present: true,
       required: slot.required,
       inspectError: observed.error,
+      inspectStatus: quality.status ?? null,
+      integrity: quality.integrity ?? null,
+      diagnostics: quality.diagnostics ?? [],
       file: observed.file,
       identity: observed.identity,
       image: observed.image,

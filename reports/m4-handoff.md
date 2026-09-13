@@ -6,6 +6,8 @@
 下层依赖：`drafts/asset-delivery-preflight/`、`drafts/channel-cover-preflight/`  
 约束：不 Host import；不 push；不改公开 catalog；不把调用次数当价值；不生成缺失素材；不扩大 Host 核心。
 
+**完成度重标（Batch A，2026-09-13）：M4 是实施侧交接演练，不是独立交接完成。** 冷读者是按 `HANDOFF.md` 跑的脚本，不是独立第三方，也不是新 Agent 会话。报告原文已写明这一点；不得把 M4 判为「已完成脱离作者的交接」。
+
 结论先行：
 
 1. **有外人能跟的入口。** `drafts/batch-delivery-preflight/HANDOFF.md` 写的是「能做什么 / 准备什么 / 最短命令 / 怎么读结果 / 出事怎么办」，不是架构说明书。

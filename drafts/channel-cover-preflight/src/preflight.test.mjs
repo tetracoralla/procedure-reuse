@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { copyFile, mkdir, mkdtemp } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { inspectPathForGrant, resolveAdapter } from "../lib/observe-file-inspect.mjs";
+import { loadSpec, runPreflight as runPreflightLib } from "./preflight.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT = join(HERE, "..");
@@ -161,4 +165,51 @@ test("wrong-aspect fixture (160x100) fails height and aspect", async () => {
   const aspect = report.checks.find((check) => !check.passed && check.id === "aspect");
   assert.equal(aspect.expected, "16:9");
   assert.equal(aspect.observed, "8:5");
+});
+
+test("inspect path is relative to the delivery root, not a parent workspace grant", () => {
+  assert.equal(
+    inspectPathForGrant("/grant", "/grant/delivery", "covers/cover-1x1.png"),
+    "delivery/covers/cover-1x1.png",
+  );
+});
+
+test("same-named cover in workspaceRoot is ignored; delivery root is inspected", async () => {
+  const tmp = await mkdtemp(join(tmpdir(), "channel-cover-path-"));
+  const delivery = join(tmp, "delivery");
+  await mkdir(join(delivery, "covers"), { recursive: true });
+  await mkdir(join(tmp, "covers"), { recursive: true });
+  await copyFile(join(PROJECT, "fixtures/good/covers/cover-1x1.png"), join(delivery, "covers/cover-1x1.png"));
+  await copyFile(join(PROJECT, "fixtures/bad/wrong-size/covers/cover-1x1.png"), join(tmp, "covers/cover-1x1.png"));
+  const spec = loadSpec(
+    JSON.stringify({
+      id: "one",
+      version: "0.1.0",
+      family: "channel-cover",
+      naming: { pattern: "^cover-(1x1|16x9|9x16|4x5)\\.(png|jpe?g)$" },
+      transparencyAllowed: false,
+      slots: [
+        {
+          id: "cover-1x1",
+          path: "covers/cover-1x1.png",
+          aspect: "1:1",
+          format: "png",
+          width: 64,
+          height: 64,
+          required: true,
+        },
+      ],
+    }),
+    "inline-one",
+  );
+  const adapter = await resolveAdapter(undefined, { projectRoot: PROJECT });
+  const report = await runPreflightLib({
+    spec,
+    root: delivery,
+    adapter,
+    workspaceRoot: tmp,
+  });
+  assert.equal(report.status, "pass");
+  const width = report.checks.find((check) => check.id === "width");
+  assert.equal(width.observed, 64);
 });

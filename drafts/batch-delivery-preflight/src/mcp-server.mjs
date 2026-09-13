@@ -138,6 +138,14 @@ function mapThrown(error) {
     return new ToolError("ROOT_NOT_FOUND", message);
   }
   if (
+    message.includes("resolves outside the workspace grant")
+    || message.includes("escapes the workspace grant")
+    || message.includes("escapes the campaign")
+    || message.includes("dangling symlink")
+  ) {
+    return new ToolError("PATH_FORBIDDEN", message);
+  }
+  if (
     message.includes("unsupported field")
     || message.includes("forbidden field")
     || message.includes("spec must")

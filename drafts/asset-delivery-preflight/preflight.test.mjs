@@ -1,9 +1,17 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { chmod, copyFile, mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import {
+  inspectPathForGrant,
+  parseSpec,
+  resolveAdapter,
+  runPreflight as runPreflightLib,
+} from "./preflight.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PREFLIGHT = join(HERE, "preflight.mjs");
@@ -141,4 +149,220 @@ test("name-mismatch spec against good files fails name", async () => {
   assert.equal(code, 1);
   const ids = failedIds(report);
   assert.deepEqual(ids, ["name"]);
+});
+
+test("inspect path is delivery-relative, not workspaceRoot-relative", () => {
+  const grant = "/grant";
+  const delivery = "/grant/delivery";
+  assert.equal(inspectPathForGrant(grant, delivery, "icon-16.png"), "delivery/icon-16.png");
+  assert.equal(inspectPathForGrant(delivery, delivery, "icon-16.png"), "icon-16.png");
+});
+
+const FAKE_ADAPTER = `#!/usr/bin/env node
+import { createInterface } from "node:readline";
+import { basename } from "node:path";
+const table = JSON.parse(process.env.FAKE_INSPECT_TABLE || "{}");
+const lines = createInterface({ input: process.stdin, crlfDelay: Infinity });
+for await (const line of lines) {
+  if (!line.trim()) continue;
+  const req = JSON.parse(line);
+  const path = req.input?.path ?? "";
+  const canned = table[path] ?? table[basename(path)];
+  if (!canned) {
+    process.stdout.write(JSON.stringify({ id: req.id, ok: false, error: { code: "NOT_FOUND", message: path } }) + "\\n");
+    continue;
+  }
+  process.stdout.write(JSON.stringify({ id: req.id, ok: true, result: canned }) + "\\n");
+}
+`;
+
+function pngResult(overrides = {}) {
+  return {
+    status: "ok",
+    file: { name: "icon-16.png", size_bytes: 80, extension: ".png" },
+    identity: {
+      kind: "image",
+      media_type: "image/png",
+      format: "PNG",
+      confidence: "exact",
+      extension_match: true,
+      candidates: [],
+      conflicts: [],
+    },
+    traits: [],
+    constraints: [],
+    integrity: { readable: true, parseable: true },
+    image: { width: 16, height: 16, bit_depth: 8, color_model: "nrgba", has_alpha: true },
+    diagnostics: [],
+    ...overrides,
+  };
+}
+
+function oneSlotSpec() {
+  return parseSpec(
+    {
+      id: "one",
+      version: "0.1.0",
+      slots: [
+        {
+          id: "icon-16",
+          path: "icon-16.png",
+          name: "icon-16.png",
+          format: "png",
+          width: 16,
+          height: 16,
+          alpha: "present",
+          required: true,
+        },
+      ],
+    },
+    "inline-one",
+  );
+}
+
+async function withFakeAdapter(table, fn) {
+  const tmp = await mkdtemp(join(tmpdir(), "asset-delivery-preflight-fake-"));
+  const dir = join(tmp, "delivery");
+  await mkdir(dir);
+  const adapter = join(tmp, "fake-adapter.mjs");
+  await writeFile(adapter, FAKE_ADAPTER);
+  await chmod(adapter, 0o755);
+  await writeFile(join(dir, "icon-16.png"), Buffer.from("not-inspected"));
+  const previous = process.env.FAKE_INSPECT_TABLE;
+  process.env.FAKE_INSPECT_TABLE = JSON.stringify(table);
+  try {
+    return await fn({ dir, adapter });
+  } finally {
+    if (previous === undefined) {
+      delete process.env.FAKE_INSPECT_TABLE;
+    } else {
+      process.env.FAKE_INSPECT_TABLE = previous;
+    }
+  }
+}
+
+test("same-named file in workspaceRoot is ignored; delivery root is inspected", async () => {
+  const tmp = await mkdtemp(join(tmpdir(), "asset-delivery-preflight-path-"));
+  const delivery = join(tmp, "delivery");
+  await mkdir(delivery);
+  await copyFile(join(HERE, "fixtures/good/icon-16.png"), join(delivery, "icon-16.png"));
+  await copyFile(join(HERE, "fixtures/good/icon-32.png"), join(tmp, "icon-16.png"));
+  const adapter = await resolveAdapter();
+  const report = await runPreflightLib({
+    spec: oneSlotSpec(),
+    root: delivery,
+    adapter,
+    workspaceRoot: tmp,
+  });
+  assert.equal(report.status, "pass");
+  const width = report.checks.find((check) => check.id === "width");
+  assert.equal(width.observed, 16);
+  assert.equal(width.passed, true);
+});
+
+test("corrupt inspect status fails the suite even when width/height would match", async () => {
+  await withFakeAdapter(
+    { "icon-16.png": pngResult({ status: "corrupt" }) },
+    async ({ dir, adapter }) => {
+      const report = await runPreflightLib({
+        spec: oneSlotSpec(),
+        root: dir,
+        adapter,
+        workspaceRoot: dir,
+      });
+      assert.equal(report.status, "fail");
+      assert.ok(report.summary.failedIds.includes("inspectStatus"));
+      const status = report.checks.find((check) => check.id === "inspectStatus");
+      assert.equal(status.observed, "corrupt");
+      assert.equal(status.passed, false);
+    },
+  );
+});
+
+test("unsupported inspect status is not a silent pass", async () => {
+  await withFakeAdapter(
+    { "icon-16.png": pngResult({ status: "unsupported", image: undefined, identity: { kind: "unknown", media_type: "application/octet-stream", format: "Unknown", confidence: "unknown", extension_match: false, candidates: [], conflicts: [] } }) },
+    async ({ dir, adapter }) => {
+      const report = await runPreflightLib({
+        spec: oneSlotSpec(),
+        root: dir,
+        adapter,
+        workspaceRoot: dir,
+      });
+      assert.equal(report.status, "fail");
+      assert.ok(report.summary.failedIds.includes("inspectStatus"));
+    },
+  );
+});
+
+test("partial observation with usable fields can still pass", async () => {
+  await withFakeAdapter(
+    { "icon-16.png": pngResult({ status: "partial" }) },
+    async ({ dir, adapter }) => {
+      const report = await runPreflightLib({
+        spec: oneSlotSpec(),
+        root: dir,
+        adapter,
+        workspaceRoot: dir,
+      });
+      assert.equal(report.status, "pass");
+      const status = report.checks.find((check) => check.id === "inspectStatus");
+      assert.equal(status.observed, "partial");
+      assert.equal(status.passed, true);
+    },
+  );
+});
+
+test("partial observation missing width fails that check, not by ignoring status", async () => {
+  await withFakeAdapter(
+    { "icon-16.png": pngResult({ status: "partial", image: { height: 16, has_alpha: true } }) },
+    async ({ dir, adapter }) => {
+      const report = await runPreflightLib({
+        spec: oneSlotSpec(),
+        root: dir,
+        adapter,
+        workspaceRoot: dir,
+      });
+      assert.equal(report.status, "fail");
+      assert.ok(report.summary.failedIds.includes("width"));
+      const status = report.checks.find((check) => check.id === "inspectStatus");
+      assert.equal(status.passed, true);
+    },
+  );
+});
+
+test("unreadable integrity fails inspectIntegrity", async () => {
+  await withFakeAdapter(
+    { "icon-16.png": pngResult({ integrity: { readable: false, parseable: false } }) },
+    async ({ dir, adapter }) => {
+      const report = await runPreflightLib({
+        spec: oneSlotSpec(),
+        root: dir,
+        adapter,
+        workspaceRoot: dir,
+      });
+      assert.equal(report.status, "fail");
+      assert.ok(report.summary.failedIds.includes("inspectIntegrity"));
+    },
+  );
+});
+
+test("error diagnostic is a failed inspectDiagnostic, not a silent pass", async () => {
+  await withFakeAdapter(
+    {
+      "icon-16.png": pngResult({
+        diagnostics: [{ code: "PROBE_FAILED", severity: "error", message: "image probe failed" }],
+      }),
+    },
+    async ({ dir, adapter }) => {
+      const report = await runPreflightLib({
+        spec: oneSlotSpec(),
+        root: dir,
+        adapter,
+        workspaceRoot: dir,
+      });
+      assert.equal(report.status, "fail");
+      assert.ok(report.summary.failedIds.includes("inspectDiagnostic"));
+    },
+  );
 });

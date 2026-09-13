@@ -2,12 +2,13 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { chmod, link, mkdir, mkdtemp, readdir, readFile, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { decodePng, encodePng, paintPattern } from "./png.mjs";
+import { GenerateFailure, runGenerate } from "./generate.mjs";
 import { loadLower } from "./lower.mjs";
 import { runGenerateThenPreflight } from "./pipeline.mjs";
 
@@ -256,6 +257,156 @@ test("does not copy preflight comparison; imports runPreflight", async () => {
   assert.match(src, /Does not bind asset-prep/);
   assert.doesNotMatch(src, /from ["'].*asset-prep/);
   assert.doesNotMatch(src, /raster\.prepare["']/);
+});
+
+function twoSlotSpec(paths) {
+  return {
+    id: "write-boundary",
+    version: "0.1.0",
+    slots: paths.map((path, index) => ({
+      id: `slot-${index}`,
+      path,
+      name: path.split("/").at(-1),
+      format: "png",
+      width: 16,
+      height: 16,
+      alpha: "any",
+      required: true,
+    })),
+  };
+}
+
+async function parseInline(spec) {
+  const lower = await loadLower();
+  return lower.parseSpec(spec, "inline-write-boundary");
+}
+
+test("legacy string dest===sourcePath misses directory-alias overwrite (reviewer case)", async () => {
+  const work = await tempOut("legacy-alias");
+  const realDir = join(work, "real");
+  await mkdir(realDir);
+  const source = join(realDir, "master.png");
+  const sourceBytes = encodePng(paintPattern(32, 32, { alpha: true }));
+  await writeFile(source, sourceBytes);
+  const alias = join(work, "alias");
+  await symlink(realDir, alias);
+  const dest = join(alias, "master.png");
+  const sourcePath = source;
+  assert.notEqual(dest, sourcePath);
+  const before = sha256(sourceBytes);
+  await writeFile(dest, Buffer.from("not-a-png"));
+  assert.notEqual(sha256(await readFile(source)), before);
+});
+
+test("directory alias of the source directory cannot be used to overwrite the source", async () => {
+  const work = await tempOut("alias-src");
+  const realDir = join(work, "real");
+  await mkdir(realDir);
+  const source = join(realDir, "master.png");
+  const sourceBytes = encodePng(paintPattern(32, 32, { alpha: true }));
+  await writeFile(source, sourceBytes);
+  const alias = join(work, "alias");
+  await symlink(realDir, alias);
+  const spec = await parseInline(twoSlotSpec(["master.png"]));
+  await assert.rejects(
+    () => runGenerate({ spec, source, out: alias, overwrite: true }),
+    (error) => error instanceof GenerateFailure && error.failures[0].id === "sourceWouldBeOverwritten",
+  );
+  assert.equal(sha256(await readFile(source)), sha256(sourceBytes));
+});
+
+test("hard link alias of the source cannot be overwritten", async () => {
+  const work = await tempOut("hardlink");
+  const source = join(work, "master.png");
+  const sourceBytes = encodePng(paintPattern(32, 32, { alpha: true }));
+  await writeFile(source, sourceBytes);
+  const out = join(work, "out");
+  await mkdir(out);
+  await link(source, join(out, "icon.png"));
+  const spec = await parseInline(twoSlotSpec(["icon.png"]));
+  await assert.rejects(
+    () => runGenerate({ spec, source, out, overwrite: true }),
+    (error) => error instanceof GenerateFailure && error.failures[0].code === "SOURCE_PRESERVE",
+  );
+  assert.equal(sha256(await readFile(source)), sha256(sourceBytes));
+});
+
+test("legacy writeFile follows a dangling dest symlink outside the output root (reviewer case)", async () => {
+  const work = await tempOut("legacy-dangle");
+  const out = join(work, "out");
+  await mkdir(out);
+  const outside = join(work, "outside", "leaked.png");
+  await mkdir(join(work, "outside"));
+  await symlink(outside, join(out, "icon.png"));
+  await writeFile(join(out, "icon.png"), Buffer.from("leaked"));
+  assert.equal(await readFile(outside, "utf8"), "leaked");
+});
+
+test("dangling dest symlink is not followed; default mode does not create files outside --out", async () => {
+  const work = await tempOut("dangle");
+  const out = join(work, "out");
+  await mkdir(out);
+  const outside = join(work, "outside", "leaked.png");
+  await mkdir(join(work, "outside"));
+  await symlink(outside, join(out, "icon.png"));
+  const source = join(work, "master.png");
+  await writeFile(source, encodePng(paintPattern(32, 32, { alpha: true })));
+  const spec = await parseInline(twoSlotSpec(["icon.png"]));
+  await assert.rejects(
+    () => runGenerate({ spec, source, out, overwrite: false }),
+    (error) => error instanceof GenerateFailure && error.failures[0].id === "outputExists",
+  );
+  await assert.rejects(readFile(outside), (error) => error && error.code === "ENOENT");
+  const overwritten = await runGenerate({ spec, source, out, overwrite: true });
+  assert.equal(overwritten.status, "pass");
+  await assert.rejects(readFile(outside), (error) => error && error.code === "ENOENT");
+  const written = decodePng(await readFile(join(out, "icon.png")));
+  assert.equal(written.width, 16);
+});
+
+test("intermediate output symlink cannot expand the write root", async () => {
+  const work = await tempOut("mid-link");
+  const out = join(work, "out");
+  await mkdir(out);
+  const outside = join(work, "outside");
+  await mkdir(outside);
+  await symlink(outside, join(out, "nested"));
+  const source = join(work, "master.png");
+  await writeFile(source, encodePng(paintPattern(32, 32, { alpha: true })));
+  const spec = await parseInline(twoSlotSpec(["nested/icon.png"]));
+  await assert.rejects(
+    () => runGenerate({ spec, source, out, overwrite: true }),
+    (error) => error instanceof GenerateFailure && error.failures[0].id === "pathEscape",
+  );
+  const names = await readdir(outside);
+  assert.deepEqual(names, []);
+});
+
+test("second-slot I/O failure reports the first file as partial output", async () => {
+  const work = await tempOut("partial");
+  const out = join(work, "out");
+  await mkdir(out);
+  const locked = join(out, "locked");
+  await mkdir(locked);
+  await chmod(locked, 0o555);
+  const source = join(work, "master.png");
+  await writeFile(source, encodePng(paintPattern(32, 32, { alpha: true })));
+  const spec = await parseInline(twoSlotSpec(["first.png", "locked/second.png"]));
+  try {
+    await runGenerate({ spec, source, out });
+    assert.fail("expected GenerateFailure");
+  } catch (error) {
+    assert.equal(error instanceof GenerateFailure, true);
+    assert.equal(error.output.partial, true);
+    assert.equal(error.output.written.length, 1);
+    assert.equal(error.output.written[0].path, "first.png");
+    assert.equal(error.failures[0].id, "writeFailed");
+    const names = (await readdir(out)).sort();
+    assert.ok(names.includes("first.png"));
+    assert.deepEqual(await readdir(locked), []);
+  } finally {
+    await chmod(locked, 0o755);
+  }
 });
 
 test("opaque source cannot satisfy alpha=present slots", async () => {

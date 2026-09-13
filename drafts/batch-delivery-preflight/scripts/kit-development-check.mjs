@@ -66,7 +66,7 @@ for (const file of syntaxFiles) {
   run(["--check", join(PROJECT, file)]);
 }
 
-run(["--test", "src/preflight.test.mjs", "src/mcp-server.test.mjs"], {
+run(["--test", "src/preflight.test.mjs", "src/mcp-server.test.mjs", "src/lower.test.mjs"], {
   env: {
     ...process.env,
     OPENADAM_CAPABILITY_WORKSPACE_ROOT: PROJECT,

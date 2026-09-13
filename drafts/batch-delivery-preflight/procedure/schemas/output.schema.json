@@ -73,7 +73,7 @@
   },
   "$defs": {
     "checkId": {
-      "enum": ["kitMissing", "name", "format", "width", "height", "alpha", "missing", "extra", "namePattern", "aspect", "transparency"]
+      "enum": ["kitMissing", "name", "format", "width", "height", "alpha", "missing", "extra", "namePattern", "aspect", "transparency", "inspectStatus", "inspectIntegrity", "inspectDiagnostic"]
     },
     "method": {
       "type": "object",
@@ -83,7 +83,9 @@
         "kit": { "type": "string", "minLength": 1, "maxLength": 160 },
         "kind": { "enum": ["asset-delivery", "channel-cover"] },
         "implementation": { "type": "string", "minLength": 1, "maxLength": 160 },
-        "procedure": { "type": "string", "minLength": 1, "maxLength": 160 }
+        "procedure": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "resolvedPath": { "type": ["string", "null"], "minLength": 1, "maxLength": 4096 },
+        "bindingMode": { "type": ["string", "null"], "enum": ["packed", "sibling-draft", "dev-fallback", null] }
       }
     },
     "check": {

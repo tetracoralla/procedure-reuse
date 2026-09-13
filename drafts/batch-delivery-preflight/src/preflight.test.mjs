@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { runPreflight } from "./preflight.mjs";
+import { parseSpec } from "./spec.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT = join(HERE, "..");
@@ -168,4 +171,56 @@ test("upper sources dispatch to lower runPreflight and do not copy slot rules", 
   assert.equal(lower.includes("Direct Runtime"), true);
   assert.match(lower, /asset-delivery-preflight\/preflight\.mjs/);
   assert.match(lower, /channel-cover-preflight\/src\/preflight\.mjs/);
+  assert.match(lower, /OPENADAM_DRAFT_DEV_BINDINGS/);
+});
+
+test("kit symlink pointing outside the campaign grant is rejected", async () => {
+  const tmp = await mkdtemp(join(tmpdir(), "batch-grant-"));
+  const campaign = join(tmp, "campaign");
+  const outside = join(tmp, "outside");
+  await mkdir(campaign);
+  await mkdir(outside);
+  await symlink(outside, join(campaign, "icons"));
+  const spec = parseSpec(
+    {
+      id: "escape",
+      version: "0.1.0",
+      family: "batch-delivery",
+      kits: [
+        {
+          id: "icons",
+          kind: "asset-delivery",
+          required: true,
+          root: "icons",
+          spec: {
+            slots: [
+              {
+                id: "icon-16",
+                path: "icon-16.png",
+                name: "icon-16.png",
+                format: "png",
+                width: 16,
+                height: 16,
+                alpha: "any",
+                required: true,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    "inline-escape",
+  );
+  await assert.rejects(
+    () => runPreflight({ spec, root: campaign, adapter: null, workspaceRoot: campaign }),
+    (error) => error instanceof Error && /outside the workspace grant|escapes/.test(error.message),
+  );
+});
+
+test("loaded method identity includes the resolved module path", async () => {
+  const { report } = await runCli("specs/good.json", "fixtures/good");
+  const icons = kitById(report, "icons");
+  assert.equal(icons.method.implementation, "org.openadam.asset-delivery-preflight@0.1.0");
+  assert.equal(icons.method.bindingMode, "sibling-draft");
+  assert.match(icons.method.resolvedPath, /asset-delivery-preflight\/preflight\.mjs$/);
 });

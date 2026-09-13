@@ -13,7 +13,7 @@
 import { spawn } from "node:child_process";
 import { access, readFile, readdir, realpath, stat } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
-import { basename, dirname, isAbsolute, join, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -251,6 +251,98 @@ function inspectError(response) {
   return null;
 }
 
+function isOutside(root, candidate) {
+  const relativePath = relative(root, candidate);
+  return relativePath === ".." || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath);
+}
+
+/**
+ * File Vitals inspect paths must name the delivery file relative to the
+ * inspect grant. When workspaceRoot is an ancestor of root, that means a
+ * prefix (delivery/icon-16.png), not the same relative name under the grant.
+ */
+export function inspectPathForGrant(workspaceRoot, deliveryRoot, slotPath) {
+  const absolute = resolve(deliveryRoot, slotPath);
+  if (isOutside(deliveryRoot, absolute)) {
+    throw new Error(`slot path escapes delivery root: ${slotPath}`);
+  }
+  if (isOutside(workspaceRoot, absolute)) {
+    throw new Error(`delivery file is outside the inspect grant: ${slotPath}`);
+  }
+  const rel = relative(workspaceRoot, absolute);
+  return rel.split(sep).join("/");
+}
+
+function observationQualityChecks(slot, response) {
+  const envelope = inspectError(response);
+  const result = response?.ok ? response.result : null;
+  const status = result?.status ?? null;
+  const integrity = result?.integrity ?? null;
+  const diagnostics = Array.isArray(result?.diagnostics) ? result.diagnostics : [];
+  const errorDiagnostics = diagnostics.filter((item) => item && item.severity === "error");
+  const checks = [];
+
+  if (envelope) {
+    checks.push(
+      checkRecord({
+        id: "inspectStatus",
+        slot: slot.id,
+        path: slot.path,
+        expected: "ok|partial",
+        observed: envelope.code,
+        passed: false,
+        error: envelope,
+      }),
+    );
+    return { checks, envelope, result, status, integrity, diagnostics };
+  }
+
+  const statusPass = status === "ok" || status === "partial";
+  checks.push(
+    checkRecord({
+      id: "inspectStatus",
+      slot: slot.id,
+      path: slot.path,
+      expected: "ok|partial",
+      observed: status,
+      passed: statusPass,
+    }),
+  );
+
+  const readable = integrity?.readable;
+  const parseable = integrity?.parseable;
+  const integrityPass = readable !== false && parseable !== false;
+  let observedIntegrity = "readable";
+  if (readable === false) {
+    observedIntegrity = "unreadable";
+  } else if (parseable === false) {
+    observedIntegrity = "unparseable";
+  }
+  checks.push(
+    checkRecord({
+      id: "inspectIntegrity",
+      slot: slot.id,
+      path: slot.path,
+      expected: "readable",
+      observed: observedIntegrity,
+      passed: integrityPass,
+    }),
+  );
+
+  checks.push(
+    checkRecord({
+      id: "inspectDiagnostic",
+      slot: slot.id,
+      path: slot.path,
+      expected: "no-error-diagnostics",
+      observed: errorDiagnostics.length === 0 ? "none" : errorDiagnostics.map((item) => item.code).join(","),
+      passed: errorDiagnostics.length === 0,
+    }),
+  );
+
+  return { checks, envelope: null, result, status, integrity, diagnostics };
+}
+
 async function inspectSession(adapter, workspaceRoot, paths) {
   if (paths.length === 0) {
     return new Map();
@@ -389,11 +481,22 @@ function compareSlot(slot, response) {
 }
 
 export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
-  const diskFiles = await listRegularFiles(root);
+  const deliveryRoot = resolve(root);
+  const inspectGrant = resolve(workspaceRoot ?? deliveryRoot);
+  if (isOutside(inspectGrant, deliveryRoot)) {
+    throw new Error(`delivery root is outside the inspect grant: ${deliveryRoot}`);
+  }
+  const diskFiles = await listRegularFiles(deliveryRoot);
   const diskSet = new Set(diskFiles);
   const declaredPaths = new Set(spec.slots.map((slot) => slot.path));
-  const inspectPaths = spec.slots.filter((slot) => diskSet.has(slot.path)).map((slot) => slot.path);
-  const responses = await inspectAll(adapter, workspaceRoot, inspectPaths);
+  const inspectBySlot = new Map();
+  for (const slot of spec.slots) {
+    if (diskSet.has(slot.path)) {
+      inspectBySlot.set(slot.path, inspectPathForGrant(inspectGrant, deliveryRoot, slot.path));
+    }
+  }
+  const inspectPaths = [...new Set(inspectBySlot.values())];
+  const responses = await inspectAll(adapter, inspectGrant, inspectPaths);
 
   const checks = [];
   const slots = [];
@@ -417,7 +520,11 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
       }
       continue;
     }
-    const compared = compareSlot(slot, responses.get(slot.path));
+    const inspectPath = inspectBySlot.get(slot.path);
+    const response = responses.get(inspectPath);
+    const quality = observationQualityChecks(slot, response);
+    checks.push(...quality.checks);
+    const compared = compareSlot(slot, response);
     checks.push(...compared.checks);
     slots.push({
       id: slot.id,
@@ -425,6 +532,9 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
       present: true,
       required: slot.required,
       inspectError: compared.error,
+      inspectStatus: quality.status ?? null,
+      integrity: quality.integrity ?? null,
+      diagnostics: quality.diagnostics ?? [],
       file: compared.observation?.file ?? null,
       identity: compared.observation?.identity
         ? {

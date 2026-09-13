@@ -4,7 +4,8 @@ import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, symlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { TOOL_NAME, callTool, handleMessage } from "./mcp-server.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -74,6 +75,64 @@ test("missing required kit is a successful fail report", async () => {
 test("MCP source does not contain a scaffold stub", async () => {
   const source = await readFile(SERVER, "utf8");
   assert.equal(source.includes("CORE_NOT_IMPLEMENTED"), false);
+});
+
+test("MCP rejects a kit symlink that points outside the workspace grant", async () => {
+  const tmp = await mkdtemp(join(tmpdir(), "batch-mcp-grant-"));
+  const campaign = join(tmp, "campaign");
+  const outside = join(tmp, "outside");
+  await mkdir(campaign);
+  await mkdir(outside);
+  await symlink(outside, join(campaign, "icons"));
+  const previous = process.env.OPENADAM_CAPABILITY_WORKSPACE_ROOT;
+  process.env.OPENADAM_CAPABILITY_WORKSPACE_ROOT = tmp;
+  try {
+    const response = await handleMessage({
+      jsonrpc: "2.0",
+      id: 9,
+      method: "tools/call",
+      params: {
+        name: TOOL_NAME,
+        arguments: {
+          root: "campaign",
+          spec: {
+            family: "batch-delivery",
+            kits: [
+              {
+                id: "icons",
+                kind: "asset-delivery",
+                required: true,
+                root: "icons",
+                spec: {
+                  slots: [
+                    {
+                      id: "icon-16",
+                      path: "icon-16.png",
+                      name: "icon-16.png",
+                      format: "png",
+                      width: 16,
+                      height: 16,
+                      alpha: "any",
+                      required: true,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+    });
+    assert.equal(response.result.isError, true);
+    assert.equal(response.result.structuredContent.status, "error");
+    assert.equal(response.result.structuredContent.error.code, "PATH_FORBIDDEN");
+  } finally {
+    if (previous === undefined) {
+      delete process.env.OPENADAM_CAPABILITY_WORKSPACE_ROOT;
+    } else {
+      process.env.OPENADAM_CAPABILITY_WORKSPACE_ROOT = previous;
+    }
+  }
 });
 
 function rpcSession(requests) {

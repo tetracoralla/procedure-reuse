@@ -6,7 +6,7 @@
 [`../asset-delivery-generate/`](../asset-delivery-generate/)。
 
 期望规格驱动的套装预检：对照槽位的**文件名、格式、宽、高、透明通道**，以及**缺槽 / 多余文件**。  
-观察层只用公开 Capability **`org.openadam.file.inspect@0.1.0`**（File Vitals JSONL `inspect`）。对照是普通代码，**不是** `raster.verify`，也不是新 DSL / 新 Capability。
+观察层只用公开 Capability **`org.openadam.file.inspect@0.1.0`**（File Vitals JSONL `inspect`）。对照是普通代码，**不是** `raster.verify`，也不是新 DSL / 新 Capability。inspect 路径相对真正的交付 root：`workspaceRoot` 是父目录时不会读到授权根下的同名文件。`result.status` / `integrity` / error diagnostics 计入可交付结论；`corrupt` 与 `unsupported` 不能静默当 pass；`partial` 有齐字段可以通过，缺宽高则仍失败。
 
 人不用跑代码，也可以对照下面的目录说出谁该过、谁该失败。
 

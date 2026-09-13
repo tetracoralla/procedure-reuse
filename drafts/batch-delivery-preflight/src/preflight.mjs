@@ -7,7 +7,7 @@
  * Observation remains org.openadam.file.inspect@0.1.0 per kit root.
  * Not raster.verify. Not Direct Runtime nesting.
  */
-import { readFile, realpath, stat } from "node:fs/promises";
+import { lstat, readFile, realpath, stat } from "node:fs/promises";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { LOWER, loadLower } from "./lower.mjs";
 
@@ -19,9 +19,56 @@ export const OBSERVER = {
   note: "Observation stays file.inspect via the lower combinators. Each kit inspect grant is that kit's root, not the campaign root. Comparison is the lower method, not raster.verify.",
 };
 
-function isOutside(root, candidate) {
+export function isOutside(root, candidate) {
   const relativePath = relative(root, candidate);
   return relativePath === ".." || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath);
+}
+
+/**
+ * Require every symlink on the path from grantCanonical to lexicalPath, and
+ * the final realpath, to stay inside grantCanonical. Lower methods inherit
+ * or tighten this grant; they never receive an escaped realpath as a new grant.
+ */
+export async function realpathInsideGrant(grantCanonical, lexicalPath, label) {
+  const absolute = resolve(lexicalPath);
+  if (isOutside(grantCanonical, absolute)) {
+    throw new Error(`${label} escapes the workspace grant: ${lexicalPath}`);
+  }
+  const rel = relative(grantCanonical, absolute);
+  const parts = rel.split(sep).filter(Boolean);
+  let current = grantCanonical;
+  for (const part of parts) {
+    current = resolve(current, part);
+    let info;
+    try {
+      info = await lstat(current);
+    } catch (error) {
+      if (error && error.code === "ENOENT") {
+        throw error;
+      }
+      throw error;
+    }
+    if (info.isSymbolicLink()) {
+      let target;
+      try {
+        target = await realpath(current);
+      } catch (error) {
+        if (error && error.code === "ENOENT") {
+          throw new Error(`${label} dangling symlink is outside a usable grant: ${current}`);
+        }
+        throw error;
+      }
+      if (isOutside(grantCanonical, target)) {
+        throw new Error(`${label} resolves outside the workspace grant: ${lexicalPath}`);
+      }
+      current = target;
+    }
+  }
+  const canonical = await realpath(absolute);
+  if (isOutside(grantCanonical, canonical)) {
+    throw new Error(`${label} resolves outside the workspace grant: ${lexicalPath}`);
+  }
+  return canonical;
 }
 
 async function directoryIfPresent(path) {
@@ -72,13 +119,18 @@ function failedFrom(checks) {
 }
 
 export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
-  const campaignRoot = root;
+  const campaignRoot = resolve(root);
+  const grantCanonical = await realpath(workspaceRoot ?? campaignRoot);
+  const campaignCanonical = await realpath(campaignRoot);
+  if (isOutside(grantCanonical, campaignCanonical)) {
+    throw new Error(`campaign root resolves outside the workspace grant: ${campaignRoot}`);
+  }
   const checks = [];
   const kits = [];
 
   for (const kit of spec.kits) {
-    const kitRoot = resolve(campaignRoot, kit.root);
-    if (isOutside(campaignRoot, kitRoot)) {
+    const kitRoot = resolve(campaignCanonical, kit.root);
+    if (isOutside(campaignCanonical, kitRoot)) {
       throw new Error(`kit ${kit.id} root escapes the campaign root: ${kit.root}`);
     }
     const present = await directoryIfPresent(kitRoot);
@@ -88,6 +140,8 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
       kind: kit.kind,
       implementation: lowerMeta.implementation,
       procedure: lowerMeta.procedure,
+      resolvedPath: null,
+      bindingMode: null,
     };
 
     if (!present) {
@@ -142,20 +196,36 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
     }
 
     const lower = await loadLower(kit.kind);
+    method.resolvedPath = lower.resolvedPath;
+    method.bindingMode = lower.bindingMode;
     let kitSpec;
     if (Object.hasOwn(kit, "spec")) {
       kitSpec = lower.parseSpec(kit.spec, `${kit.id}.spec`);
       kitSpec._path = null;
     } else {
-      const specFile = resolve(spec._specDir ?? campaignRoot, kit.specPath);
-      if (spec._specDir && isOutside(spec._specDir, specFile)) {
+      const specDir = spec._specDir ?? campaignCanonical;
+      const specFile = resolve(specDir, kit.specPath);
+      if (isOutside(specDir, specFile)) {
         throw new Error(`kit ${kit.id} specPath escapes the campaign spec directory: ${kit.specPath}`);
       }
-      kitSpec = lower.parseSpec(JSON.parse(await readFile(specFile, "utf8")), specFile);
-      kitSpec._path = specFile;
+      const specDirCanonical = await realpath(specDir);
+      const specCanonical = await realpathInsideGrant(
+        specDirCanonical,
+        specFile,
+        `kit ${kit.id} specPath`,
+      );
+      kitSpec = lower.parseSpec(JSON.parse(await readFile(specCanonical, "utf8")), specCanonical);
+      kitSpec._path = specCanonical;
     }
 
-    const inspectRoot = await realpath(kitRoot);
+    const inspectRoot = await realpathInsideGrant(
+      campaignCanonical,
+      kitRoot,
+      `kit ${kit.id} root`,
+    );
+    if (isOutside(grantCanonical, inspectRoot)) {
+      throw new Error(`kit ${kit.id} root resolves outside the workspace grant: ${kit.root}`);
+    }
     const lowerReport = await lower.runPreflight({
       spec: kitSpec,
       root: inspectRoot,

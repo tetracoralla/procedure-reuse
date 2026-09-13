@@ -1,28 +1,31 @@
 /**
  * Bounded 8-bit PNG decode / cover-crop downscale / encode.
  *
- * Ordinary image code for this draft. Not org.openadam.raster.prepare,
- * not asset-prep, and not a public Capability provider.
+ * Decode and encode use vendored pngjs 7.0.0 (MIT). Downscale is a
+ * documented premultiplied-alpha, area-weighted box filter in this file.
+ * Not org.openadam.raster.prepare, not asset-prep, and not a public
+ * Capability provider.
+ *
+ * Supported input/output: non-interlaced 8-bit RGB (color type 2) or
+ * RGBA (color type 6) PNG only. Palette, grayscale, 16-bit, interlaced,
+ * and APNG are rejected. Formats are not expanded.
  */
-import { crc32, deflateSync, inflateSync } from "node:zlib";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const require = createRequire(import.meta.url);
+const { PNG } = require(join(dirname(fileURLToPath(import.meta.url)), "../third_party/pngjs/lib/png.js"));
 
 export const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 export const MAX_DIMENSION = 4096;
 export const MAX_PIXELS = 4096 * 4096;
-
-function paethPredictor(a, b, c) {
-  const p = a + b - c;
-  const pa = Math.abs(p - a);
-  const pb = Math.abs(p - b);
-  const pc = Math.abs(p - c);
-  if (pa <= pb && pa <= pc) {
-    return a;
-  }
-  if (pb <= pc) {
-    return b;
-  }
-  return c;
-}
+export const MAX_INPUT_BYTES = 32 * 1024 * 1024;
+export const PNG_CODEC = {
+  implementation: "pngjs@7.0.0",
+  filter: "premultiplied-alpha-area-box",
+  note: "pngjs decodes/encodes 8-bit RGB/RGBA. Resample is an area-weighted box filter with premultiplied alpha. Transparent RGB does not tint visible color.",
+};
 
 function assertDimension(width, height, label) {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1) {
@@ -36,151 +39,90 @@ function assertDimension(width, height, label) {
   }
 }
 
-function readChunk(buffer, offset) {
-  if (offset + 12 > buffer.length) {
-    throw new Error("truncated PNG chunk header");
-  }
-  const length = buffer.readUInt32BE(offset);
-  const type = buffer.subarray(offset + 4, offset + 8).toString("binary");
-  const dataStart = offset + 8;
-  const dataEnd = dataStart + length;
-  const crcEnd = dataEnd + 4;
-  if (crcEnd > buffer.length) {
-    throw new Error(`truncated PNG chunk ${type}`);
-  }
-  const data = buffer.subarray(dataStart, dataEnd);
-  const expectedCrc = buffer.readUInt32BE(dataEnd);
-  const actualCrc = crc32(buffer.subarray(offset + 4, dataEnd)) >>> 0;
-  if (actualCrc !== expectedCrc) {
-    throw new Error(`PNG chunk ${type} CRC mismatch`);
-  }
-  return { type, data, next: crcEnd };
-}
-
-function unfilter(inflated, width, height, channels) {
-  const stride = width * channels;
-  const rowBytes = stride + 1;
-  if (inflated.length !== rowBytes * height) {
-    throw new Error("PNG IDAT size does not match IHDR");
-  }
-  const out = new Uint8Array(stride * height);
-  for (let y = 0; y < height; y += 1) {
-    const filter = inflated[y * rowBytes];
-    const srcRow = y * rowBytes + 1;
-    const dstRow = y * stride;
-    const prevRow = y === 0 ? null : (y - 1) * stride;
-    for (let x = 0; x < stride; x += 1) {
-      const raw = inflated[srcRow + x];
-      const a = x >= channels ? out[dstRow + x - channels] : 0;
-      const b = prevRow === null ? 0 : out[prevRow + x];
-      const c = prevRow === null || x < channels ? 0 : out[prevRow + x - channels];
-      let recon;
-      switch (filter) {
-        case 0:
-          recon = raw;
-          break;
-        case 1:
-          recon = (raw + a) & 255;
-          break;
-        case 2:
-          recon = (raw + b) & 255;
-          break;
-        case 3:
-          recon = (raw + ((a + b) >> 1)) & 255;
-          break;
-        case 4:
-          recon = (raw + paethPredictor(a, b, c)) & 255;
-          break;
-        default:
-          throw new Error(`unsupported PNG filter ${filter}`);
-      }
-      out[dstRow + x] = recon;
-    }
-  }
-  return out;
-}
-
-export function decodePng(buffer) {
+function admitPngBytes(buffer) {
   if (!Buffer.isBuffer(buffer) && !(buffer instanceof Uint8Array)) {
     throw new Error("PNG bytes are required");
   }
   const bytes = Buffer.from(buffer);
-  if (bytes.length < 33 || !bytes.subarray(0, 8).equals(PNG_SIGNATURE)) {
+  if (bytes.length > MAX_INPUT_BYTES) {
+    throw new Error(`PNG exceeds max input size ${MAX_INPUT_BYTES} bytes`);
+  }
+  if (bytes.length < 8 || !bytes.subarray(0, 8).equals(PNG_SIGNATURE)) {
     throw new Error("not a PNG (signature mismatch)");
   }
-  let offset = 8;
-  let header = null;
-  const idatParts = [];
-  let sawIdat = false;
-  let ended = false;
-  while (offset < bytes.length) {
-    const chunk = readChunk(bytes, offset);
-    offset = chunk.next;
-    if (ended) {
-      throw new Error("PNG data after IEND");
-    }
-    if (chunk.type === "IHDR") {
-      if (header) {
-        throw new Error("duplicate IHDR");
-      }
-      if (chunk.data.length !== 13) {
-        throw new Error("invalid IHDR");
-      }
-      const width = chunk.data.readUInt32BE(0);
-      const height = chunk.data.readUInt32BE(4);
-      const bitDepth = chunk.data[8];
-      const colorType = chunk.data[9];
-      const compression = chunk.data[10];
-      const filter = chunk.data[11];
-      const interlace = chunk.data[12];
-      assertDimension(width, height, "PNG");
-      if (bitDepth !== 8 || (colorType !== 2 && colorType !== 6) || compression !== 0 || filter !== 0 || interlace !== 0) {
-        throw new Error("only non-interlaced 8-bit RGB/RGBA PNG is supported");
-      }
-      header = { width, height, colorType, channels: colorType === 6 ? 4 : 3 };
-      continue;
-    }
-    if (!header) {
-      throw new Error("PNG chunk before IHDR");
-    }
-    if (chunk.type === "IDAT") {
-      sawIdat = true;
-      idatParts.push(chunk.data);
-      continue;
-    }
-    if (chunk.type === "IEND") {
-      ended = true;
-      continue;
-    }
-    if (chunk.type === "PLTE" || chunk.type === "tRNS") {
-      throw new Error(`unsupported PNG chunk ${chunk.type}`);
-    }
-    const ancillary = (chunk.type.charCodeAt(0) & 0x20) !== 0;
-    if (!ancillary) {
-      throw new Error(`unsupported critical PNG chunk ${chunk.type}`);
-    }
+  if (bytes.length < 33) {
+    throw new Error("PNG missing IHDR");
   }
-  if (!ended || !sawIdat || !header) {
-    throw new Error("incomplete PNG");
+  const length = bytes.readUInt32BE(8);
+  const type = bytes.subarray(12, 16).toString("binary");
+  if (type !== "IHDR" || length !== 13) {
+    throw new Error("PNG missing IHDR");
   }
-  const inflated = inflateSync(Buffer.concat(idatParts));
-  const data = unfilter(inflated, header.width, header.height, header.channels);
-  return {
-    width: header.width,
-    height: header.height,
-    channels: header.channels,
-    colorType: header.colorType,
-    data,
-  };
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  const bitDepth = bytes[24];
+  const colorType = bytes[25];
+  const compression = bytes[26];
+  const filter = bytes[27];
+  const interlace = bytes[28];
+  assertDimension(width, height, "PNG");
+  if (bitDepth !== 8 || (colorType !== 2 && colorType !== 6) || compression !== 0 || filter !== 0 || interlace !== 0) {
+    throw new Error("only non-interlaced 8-bit RGB/RGBA PNG is supported");
+  }
+  const channels = colorType === 6 ? 4 : 3;
+  const maxInflated = (width * channels + 1) * height;
+  if (maxInflated > MAX_INPUT_BYTES) {
+    throw new Error(`PNG inflated raster would exceed ${MAX_INPUT_BYTES} bytes`);
+  }
+  return { bytes, width, height, colorType, channels };
 }
 
-function writeChunk(type, data) {
-  const typeBytes = Buffer.from(type, "binary");
-  const length = Buffer.alloc(4);
-  length.writeUInt32BE(data.length, 0);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(Buffer.concat([typeBytes, data])) >>> 0, 0);
-  return Buffer.concat([length, typeBytes, data, crc]);
+function packRgb(rgba, width, height) {
+  const data = new Uint8Array(width * height * 3);
+  for (let i = 0, o = 0; i < rgba.length; i += 4, o += 3) {
+    data[o] = rgba[i];
+    data[o + 1] = rgba[i + 1];
+    data[o + 2] = rgba[i + 2];
+  }
+  return data;
+}
+
+function expandRgb(rgb, width, height) {
+  const data = Buffer.alloc(width * height * 4);
+  for (let i = 0, o = 0; i < rgb.length; i += 3, o += 4) {
+    data[o] = rgb[i];
+    data[o + 1] = rgb[i + 1];
+    data[o + 2] = rgb[i + 2];
+    data[o + 3] = 255;
+  }
+  return data;
+}
+
+export function decodePng(buffer) {
+  const admitted = admitPngBytes(buffer);
+  let parsed;
+  try {
+    parsed = PNG.sync.read(admitted.bytes);
+  } catch (error) {
+    throw new Error(`source is not a usable 8-bit RGB/RGBA PNG: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (parsed.colorType !== admitted.colorType || parsed.depth !== 8 || parsed.interlace) {
+    throw new Error("only non-interlaced 8-bit RGB/RGBA PNG is supported");
+  }
+  if (parsed.width !== admitted.width || parsed.height !== admitted.height) {
+    throw new Error("PNG IHDR does not match decoded raster");
+  }
+  const channels = admitted.channels;
+  const data = channels === 4
+    ? Uint8Array.from(parsed.data)
+    : packRgb(parsed.data, parsed.width, parsed.height);
+  return {
+    width: parsed.width,
+    height: parsed.height,
+    channels,
+    colorType: admitted.colorType,
+    data,
+  };
 }
 
 export function encodePng(image) {
@@ -192,28 +134,14 @@ export function encodePng(image) {
   if (!(data instanceof Uint8Array) || data.length !== width * height * channels) {
     throw new Error("PNG pixel buffer size mismatch");
   }
-  const stride = width * channels;
-  const raw = Buffer.alloc((stride + 1) * height);
-  for (let y = 0; y < height; y += 1) {
-    const dst = y * (stride + 1);
-    raw[dst] = 0;
-    raw.set(data.subarray(y * stride, y * stride + stride), dst + 1);
-  }
-  const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(width, 0);
-  ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8;
-  ihdr[9] = channels === 4 ? 6 : 2;
-  ihdr[10] = 0;
-  ihdr[11] = 0;
-  ihdr[12] = 0;
-  const idat = deflateSync(raw, { level: 9 });
-  return Buffer.concat([
-    PNG_SIGNATURE,
-    writeChunk("IHDR", ihdr),
-    writeChunk("IDAT", idat),
-    writeChunk("IEND", Buffer.alloc(0)),
-  ]);
+  const png = new PNG({ width, height, bitDepth: 8 });
+  png.data = channels === 4 ? Buffer.from(data) : expandRgb(data, width, height);
+  return PNG.sync.write(png, {
+    colorType: channels === 4 ? 6 : 2,
+    width,
+    height,
+    bitDepth: 8,
+  });
 }
 
 export function coverCrop(srcWidth, srcHeight, destWidth, destHeight) {
@@ -251,33 +179,91 @@ export function needsUpscale(crop, destWidth, destHeight) {
   return crop.width < destWidth || crop.height < destHeight;
 }
 
+function overlap(a0, a1, b0, b1) {
+  return Math.max(0, Math.min(a1, b1) - Math.max(a0, b0));
+}
+
+/**
+ * Area-weighted box filter. RGBA uses premultiplied alpha so fully
+ * transparent RGB does not contaminate the visible color.
+ *
+ * Dest pixel (dx, dy) covers the source rectangle
+ *   [dx * crop.w / destW, (dx+1) * crop.w / destW]
+ * × [dy * crop.h / destH, (dy+1) * crop.h / destH]
+ * relative to the crop origin, including fractional edge pixels.
+ */
 export function resampleArea(image, crop, destWidth, destHeight) {
   assertDimension(destWidth, destHeight, "resample");
-  const { width: srcWidth, channels, data } = image;
+  const { width: srcWidth, height: srcHeight, channels, data } = image;
+  if (crop.x < 0 || crop.y < 0 || crop.width < 1 || crop.height < 1) {
+    throw new Error("invalid crop");
+  }
+  if (crop.x + crop.width > srcWidth || crop.y + crop.height > srcHeight) {
+    throw new Error("crop exceeds source");
+  }
   const dest = new Uint8Array(destWidth * destHeight * channels);
+  const hasAlpha = channels === 4;
   const cropXEnd = crop.x + crop.width;
   const cropYEnd = crop.y + crop.height;
+
   for (let dy = 0; dy < destHeight; dy += 1) {
-    const y0 = crop.y + Math.floor((dy * crop.height) / destHeight);
-    const y1 = Math.min(cropYEnd, Math.max(y0 + 1, crop.y + Math.floor(((dy + 1) * crop.height) / destHeight)));
+    const yStart = crop.y + (dy * crop.height) / destHeight;
+    const yEnd = crop.y + ((dy + 1) * crop.height) / destHeight;
+    const y0 = Math.max(crop.y, Math.floor(yStart));
+    const y1 = Math.min(cropYEnd, Math.ceil(yEnd));
     for (let dx = 0; dx < destWidth; dx += 1) {
-      const x0 = crop.x + Math.floor((dx * crop.width) / destWidth);
-      const x1 = Math.min(cropXEnd, Math.max(x0 + 1, crop.x + Math.floor(((dx + 1) * crop.width) / destWidth)));
-      const sums = new Float64Array(channels);
-      let count = 0;
+      const xStart = crop.x + (dx * crop.width) / destWidth;
+      const xEnd = crop.x + ((dx + 1) * crop.width) / destWidth;
+      const x0 = Math.max(crop.x, Math.floor(xStart));
+      const x1 = Math.min(cropXEnd, Math.ceil(xEnd));
+      let area = 0;
+      let alphaArea = 0;
+      const premul = [0, 0, 0];
+      const rgb = [0, 0, 0];
       for (let y = y0; y < y1; y += 1) {
+        const yWeight = overlap(y, y + 1, yStart, yEnd);
+        if (yWeight <= 0) {
+          continue;
+        }
         for (let x = x0; x < x1; x += 1) {
-          const si = (y * srcWidth + x) * channels;
-          for (let c = 0; c < channels; c += 1) {
-            sums[c] += data[si + c];
+          const xWeight = overlap(x, x + 1, xStart, xEnd);
+          if (xWeight <= 0) {
+            continue;
           }
-          count += 1;
+          const weight = xWeight * yWeight;
+          const si = (y * srcWidth + x) * channels;
+          area += weight;
+          if (hasAlpha) {
+            const a = data[si + 3] / 255;
+            premul[0] += data[si] * a * weight;
+            premul[1] += data[si + 1] * a * weight;
+            premul[2] += data[si + 2] * a * weight;
+            alphaArea += a * weight;
+          } else {
+            rgb[0] += data[si] * weight;
+            rgb[1] += data[si + 1] * weight;
+            rgb[2] += data[si + 2] * weight;
+          }
         }
       }
       const di = (dy * destWidth + dx) * channels;
-      const denom = count === 0 ? 1 : count;
-      for (let c = 0; c < channels; c += 1) {
-        dest[di + c] = Math.round(sums[c] / denom);
+      if (hasAlpha) {
+        const outAlpha = area === 0 ? 0 : alphaArea / area;
+        dest[di + 3] = Math.round(outAlpha * 255);
+        if (alphaArea <= 0) {
+          dest[di] = 0;
+          dest[di + 1] = 0;
+          dest[di + 2] = 0;
+        } else {
+          dest[di] = Math.round(premul[0] / alphaArea);
+          dest[di + 1] = Math.round(premul[1] / alphaArea);
+          dest[di + 2] = Math.round(premul[2] / alphaArea);
+        }
+      } else {
+        const denom = area === 0 ? 1 : area;
+        dest[di] = Math.round(rgb[0] / denom);
+        dest[di + 1] = Math.round(rgb[1] / denom);
+        dest[di + 2] = Math.round(rgb[2] / denom);
       }
     }
   }

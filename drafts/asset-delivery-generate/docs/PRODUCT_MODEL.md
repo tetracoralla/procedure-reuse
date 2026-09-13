@@ -50,13 +50,18 @@ No MCP, no Procedure catalog identity, no Host import in this milestone.
 
 - Source: non-interlaced 8-bit RGB or RGBA PNG
 - Output slots: PNG only
-- Fit: center cover-crop, then area-average downscale
+- Fit: center cover-crop, then premultiplied-alpha area-weighted box filter
+- Codec: pngjs 7.0.0 (vendored); 8-bit non-interlaced RGB/RGBA only
 - Upscale: forbidden
-- Max dimension 4096; max 32 slots via the preflight spec parser
+- Max dimension 4096; max 32 slots via the preflight spec parser;
+  max PNG input 32 MiB
 - Does not trim transparent padding, apply projective maps, or place a
   brand mark
-- Default: do not overwrite existing slot files (`--overwrite` to replace)
-- Source file is never opened for write
+- Default: exclusive-create at write time (`--overwrite` to replace)
+- Source file, including symlink and hard-link aliases, is never overwritten
+- Output-root and intermediate symlinks cannot expand the write set
+- Write I/O errors report `output.written` / `output.partial`; this is not
+  an OS sandbox
 
 ## Ambiguity
 

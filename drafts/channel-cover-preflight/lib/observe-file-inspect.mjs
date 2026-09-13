@@ -8,8 +8,9 @@
 import { spawn } from "node:child_process";
 import { access, stat } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { findWorkspace } from "./workspace.mjs";
+import { checkRecord } from "./check-record.mjs";
 
 export const JSONL_BATCH_LIMIT = 16;
 export const OBSERVER = {
@@ -45,6 +46,92 @@ export function observedAlpha(image) {
     return "unknown";
   }
   return image.has_alpha ? "present" : "absent";
+}
+
+function isOutside(root, candidate) {
+  const relativePath = relative(root, candidate);
+  return relativePath === ".." || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath);
+}
+
+export function inspectPathForGrant(workspaceRoot, deliveryRoot, slotPath) {
+  const absolute = resolve(deliveryRoot, slotPath);
+  if (isOutside(deliveryRoot, absolute)) {
+    throw new Error(`slot path escapes delivery root: ${slotPath}`);
+  }
+  if (isOutside(workspaceRoot, absolute)) {
+    throw new Error(`delivery file is outside the inspect grant: ${slotPath}`);
+  }
+  return relative(workspaceRoot, absolute).split(sep).join("/");
+}
+
+export function observationQualityChecks(slot, response) {
+  const envelope = inspectError(response);
+  const result = response?.ok ? response.result : null;
+  const status = result?.status ?? null;
+  const integrity = result?.integrity ?? null;
+  const diagnostics = Array.isArray(result?.diagnostics) ? result.diagnostics : [];
+  const errorDiagnostics = diagnostics.filter((item) => item && item.severity === "error");
+  const checks = [];
+
+  if (envelope) {
+    checks.push(
+      checkRecord({
+        id: "inspectStatus",
+        slot: slot.id,
+        path: slot.path,
+        expected: "ok|partial",
+        observed: envelope.code,
+        passed: false,
+        error: envelope,
+      }),
+    );
+    return { checks, envelope, result, status, integrity, diagnostics };
+  }
+
+  const statusPass = status === "ok" || status === "partial";
+  checks.push(
+    checkRecord({
+      id: "inspectStatus",
+      slot: slot.id,
+      path: slot.path,
+      expected: "ok|partial",
+      observed: status,
+      passed: statusPass,
+    }),
+  );
+
+  const readable = integrity?.readable;
+  const parseable = integrity?.parseable;
+  const integrityPass = readable !== false && parseable !== false;
+  let observedIntegrity = "readable";
+  if (readable === false) {
+    observedIntegrity = "unreadable";
+  } else if (parseable === false) {
+    observedIntegrity = "unparseable";
+  }
+  checks.push(
+    checkRecord({
+      id: "inspectIntegrity",
+      slot: slot.id,
+      path: slot.path,
+      expected: "readable",
+      observed: observedIntegrity,
+      passed: integrityPass,
+    }),
+  );
+
+  checks.push(
+    checkRecord({
+      id: "inspectDiagnostic",
+      slot: slot.id,
+      path: slot.path,
+      expected: "no-error-diagnostics",
+      observed: errorDiagnostics.length === 0 ? "none" : errorDiagnostics.map((item) => item.code).join(","),
+      passed: errorDiagnostics.length === 0,
+    }),
+  );
+
+  return { checks, envelope: null, result, status, integrity, diagnostics };
 }
 
 export function inspectError(response) {

@@ -1,6 +1,7 @@
 # 交接入口：一批交付包预检
 
 给**没有参与开发的人**和**没有装过这个方法的 Agent**。这不是架构说明书。
+M4 记录的是实施侧交接演练，不是独立第三方交接完成。
 
 Agent: default path is the CLI in「怎样第一次运行」. Do not assume MCP, Procedure JSONL, or Agent Host import. Read `handoff/AGENT.md` if you are an Agent.
 

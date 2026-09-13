@@ -45,6 +45,9 @@
           "present": { "type": "boolean" },
           "required": { "type": "boolean" },
           "inspectError": { "type": ["object", "null"] },
+          "inspectStatus": { "type": ["string", "null"] },
+          "integrity": { "type": ["object", "null"] },
+          "diagnostics": { "type": "array" },
           "file": { "type": ["object", "null"] },
           "identity": { "type": ["object", "null"] },
           "image": { "type": ["object", "null"] }
@@ -64,7 +67,7 @@
         "additionalProperties": false,
         "required": ["id", "passed", "expected", "observed"],
         "properties": {
-          "id": { "enum": ["namePattern", "format", "width", "height", "aspect", "transparency", "missing", "extra"] },
+          "id": { "enum": ["namePattern", "format", "width", "height", "aspect", "transparency", "missing", "extra", "inspectStatus", "inspectIntegrity", "inspectDiagnostic"] },
           "passed": { "type": "boolean" },
           "expected": { "type": ["string", "integer", "boolean", "null"] },
           "observed": { "type": ["string", "integer", "boolean", "null"] },
@@ -86,8 +89,8 @@
         "failed": { "type": "integer", "minimum": 0 },
         "failedIds": {
           "type": "array",
-          "maxItems": 8,
-          "items": { "enum": ["namePattern", "format", "width", "height", "aspect", "transparency", "missing", "extra"] }
+          "maxItems": 12,
+          "items": { "enum": ["namePattern", "format", "width", "height", "aspect", "transparency", "missing", "extra", "inspectStatus", "inspectIntegrity", "inspectDiagnostic"] }
         }
       }
     }
