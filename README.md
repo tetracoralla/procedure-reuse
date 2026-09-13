@@ -12,7 +12,8 @@ off, then generate versions and preflight again.
 | Path | Role |
 | --- | --- |
 | `PLAN_BRIEF.md` | Program constraints |
-| `reports/` | Milestone records (inventory → generate) |
+| `reports/` | Milestone records (inventory → generate) plus Batch A–C review responses |
+| `reports/batch-c/` | Batch C synthetic-authorized-substitute pack (not a sixth method) |
 | `drafts/asset-delivery-preflight/` | Icon-pack preflight (`file.inspect` + ordinary compare) |
 | `drafts/channel-cover-preflight/` | Second method via authoring path |
 | `drafts/devkit-compose-scaffold/` | Compose-procedure scaffold (Kit repo not patched) |
@@ -60,7 +61,11 @@ This tree does **not** claim the Procedure authoring-and-reuse program is
 done. M4 is a handoff drill, not an independent third-party handoff. M5 is
 a narrow PNG generate+preflight slice; write-boundary and image fixes from
 review Batch A are in `reports/review-response-batch-a.md`. Clean-environment
-reproducibility (Batch B) is in `reports/review-response-batch-b.md`.
+reproducibility (Batch B) is in `reports/review-response-batch-b.md`. Batch C
+(`reports/review-response-batch-c.md`) is a `synthetic-authorized-substitute`
+store-listing rehearsal from CLI + `docs/CLEAN_ENV.md`. It is not a
+user-authorized brand pack, not Host Skill selection, and not an independent
+third-party handoff.
 
 ## License
 

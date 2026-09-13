@@ -5,7 +5,8 @@ M4 记录的是实施侧交接演练，不是独立第三方交接完成。
 
 Agent: default path is the CLI in「怎样第一次运行」. Do not assume MCP, Procedure JSONL, or Agent Host import. Read `handoff/AGENT.md` if you are an Agent.
 
-工作根（本仓库）：`/workspace/openadam-procedure-reuse/`  
+工作根：本仓库的 clone（Linux x64 + Node；干净环境见仓库 `docs/CLEAN_ENV.md`）。  
+不要照抄历史路径 `/workspace/openadam-procedure-reuse/`——那是另一棵树，不是本 clone。  
 本项目：`drafts/batch-delivery-preflight/`
 
 ---
@@ -76,8 +77,8 @@ M3 自带夹具把封面写成 `covers/cover-1x1.png`，同时 kit `root` 也是
 | --- | --- | --- |
 | 本目录 + 两个下层草稿（兄弟目录） | 上层用普通 `import()` 调下层 `runPreflight` | `combinator not found` |
 | `bin/capability-adapter` | File Vitals JSONL `inspect` | `File Vitals JSONL adapter not found` |
-| Node 18+（CLI） | 跑 `src/cli.mjs` | 换 Node；本仓库 `.tools/node` 是 v22 |
-| Go 1.26.6+ | **仅当**要重新编译适配器 | 已有 `bin/` 就不用 Go |
+| Node 18+（CLI） | 跑 `src/cli.mjs` | 换 Node。CLI 不要求 Node 22；Kit/契约工具才要。不要默认用作者 `.tools/node` |
+| Go 1.26.6+ | **仅当**要重新编译适配器 | 已有本机刚编的 `bin/` 可跳过。干净环境按 `docs/CLEAN_ENV.md` 拉 pin 再编，不要默认用作者 `.tools/go` |
 
 两个下层目录：
 
@@ -95,7 +96,7 @@ M3 自带夹具把封面写成 `covers/cover-1x1.png`，同时 kit `root` 也是
 ```bash
 cd drafts/batch-delivery-preflight
 
-# 若 bin/capability-adapter 不存在或不可执行：
+# 若 bin/capability-adapter 不存在或不可执行（干净环境见仓库 docs/CLEAN_ENV.md）：
 scripts/build-file-vitals.sh
 
 # 最短命令（作者自带的好夹具，用来确认工具能跑）
@@ -157,14 +158,14 @@ node src/cli.mjs \
 | 你看到的 | 先查 | 怎么修 |
 | --- | --- | --- |
 | `both --spec and --root are required` | 参数 | 两条都给 |
-| `File Vitals JSONL adapter not found` | `bin/capability-adapter` | `scripts/build-file-vitals.sh`（需 Go 1.26.6+；本仓库 `.tools/go`） |
+| `File Vitals JSONL adapter not found` | `bin/capability-adapter` | 仓库根 `sh scripts/fetch-deps.sh --file-vitals` 然后 `sh scripts/build-file-vitals.sh --all-drafts`（Go 1.26.6+，见 `docs/CLEAN_ENV.md`） |
 | `combinator not found` | 兄弟草稿是否还在 | 不要只拷贝这一个目录 |
 | `family must be batch-delivery` | 战役 JSON | 下层封面规格才是 `family: channel-cover`；图标规格没有 `family` |
 | `unsupported field` / `forbidden field` | 规格里出现审美/生成字段 | 删掉 `quality` / `brand` / `generate` 等 |
 | `kitMissing` | `kit.root` 对战役根 | 目录名要一致 |
 | 同时 `missing` 和 `extra` | 槽位 `path` 和磁盘相对路径 | 差一层 `covers/` 是最常见的 |
 | `specPath … not found` / 读到错误 JSON | `specPath` 相对战役 JSON 目录 | 不要相对 `--root` |
-| Kit `check` 报 Node 版本 | 契约工具要 Node ≥22 | CLI 预检本身不需要；`.tools/node` 仅给 Kit/符合性 |
+| Kit `check` 报 Node 版本 | 契约工具要 Node ≥22 | CLI 预检本身不需要 Node 22 |
 | 想 `agent-host component import` | 本环境不做 | Linux 上 preview 已失败（GNU tar + 无 linux-x64 发行）。未授权不要 import |
 
 卡住仍无法判断时，把完整 JSON（或 `--compact` 那一行 `status` / `failedKits` / `failedIds`）交给人，不要改规格里没有的字段。
@@ -200,3 +201,4 @@ node src/cli.mjs \
 - 用户本机 Agent Host 安装
 - 缺图自动生成
 - 公开目录 / 市场发布
+- 独立第三方真人交接（M4 是演练；Batch C 是新会话 CLI 使用一份 `synthetic-authorized-substitute` 任务，仍不是第三方授权素材包）

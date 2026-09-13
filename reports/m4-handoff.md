@@ -8,6 +8,8 @@
 
 **完成度重标（Batch A，2026-09-13）：M4 是实施侧交接演练，不是独立交接完成。** 冷读者是按 `HANDOFF.md` 跑的脚本，不是独立第三方，也不是新 Agent 会话。报告原文已写明这一点；不得把 M4 判为「已完成脱离作者的交接」。
 
+**Batch C（2026-09-13）：** 新会话按 `HANDOFF.md` / `docs/CLEAN_ENV.md` 跑了一份 `synthetic-authorized-substitute` 任务（Northline Transit store listing）。这仍不是独立第三方真人交接，没有 Host 安装，也没有用户授权的真实素材包。见 `reports/review-response-batch-c.md`。
+
 结论先行：
 
 1. **有外人能跟的入口。** `drafts/batch-delivery-preflight/HANDOFF.md` 写的是「能做什么 / 准备什么 / 最短命令 / 怎么读结果 / 出事怎么办」，不是架构说明书。
