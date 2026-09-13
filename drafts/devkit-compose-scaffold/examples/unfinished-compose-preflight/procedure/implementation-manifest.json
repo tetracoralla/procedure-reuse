@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "openadam.procedure-implementation-manifest.v0.5",
+  "provider": {
+    "id": "org.example.unfinished-compose-preflight",
+    "name": "Unfinished compose preflight",
+    "version": "0.1.0"
+  },
+  "implementations": [
+    {
+      "procedureId": "org.example.unfinished-compose.preflight",
+      "procedureVersion": "0.1.0",
+      "profileDigest": "sha256:52490f4ab0ae924ad02af4ca5f7dbfca3a61d812f6b1cf1549c8aa9a8609bd8c",
+      "adapter": {
+        "protocol": "openadam.procedure-jsonl.v0.2",
+        "command": "node",
+        "args": [
+          "procedure/adapter.mjs"
+        ]
+      },
+      "binding": {
+        "kind": "cli",
+        "target": "procedure/adapter.mjs"
+      },
+      "contractSchemaDigests": {
+        "input": "sha256:16ab63624b445cf254941e299668f1cac33e3e66a9fc5b7736d6491e5913b0c9",
+        "output": "sha256:41328841a6e2da938c7bd9986d2e1353d7702e0e434b9b13409f65deb54dc80c"
+      },
+      "stages": [
+        {
+          "stageId": "inspect-files",
+          "capabilityId": "org.openadam.file.inspect",
+          "capabilityVersion": "0.1.0",
+          "operationId": "inspect",
+          "provider": {
+            "id": "io.github.tetracoralla.file-vitals",
+            "name": "File Vitals",
+            "version": "0.3.3",
+            "homepage": "https://github.com/tetracoralla/file-vitals"
+          },
+          "transport": "capability-jsonl",
+          "target": "cmd/capability-adapter#inspect"
+        }
+      ]
+    }
+  ]
+}

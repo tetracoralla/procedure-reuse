@@ -1,0 +1,23 @@
+{
+  "id": "campaign-icons-wrong-height",
+  "version": "0.1.0",
+  "family": "batch-delivery",
+  "title": "Two-kit campaign with mutated icon height spec",
+  "description": "Identical kit roots to specs/good.json. Only the icon kit spec changes og-cover.height 360→361. Used to prove a lower spec edit changes the batch result.",
+  "kits": [
+    {
+      "id": "icons",
+      "kind": "asset-delivery",
+      "required": true,
+      "root": "icons",
+      "specPath": "kits/asset-delivery.wrong-height.json"
+    },
+    {
+      "id": "covers",
+      "kind": "channel-cover",
+      "required": true,
+      "root": "covers",
+      "specPath": "kits/channel-cover.good.json"
+    }
+  ]
+}

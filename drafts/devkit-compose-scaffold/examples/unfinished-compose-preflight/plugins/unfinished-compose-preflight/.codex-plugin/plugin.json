@@ -1,0 +1,21 @@
+{
+  "name": "unfinished-compose-preflight",
+  "version": "0.1.0",
+  "description": "Generated scaffold left unfinished on purpose so check fails until compareSlot exists.",
+  "author": {
+    "name": "openAdam"
+  },
+  "license": "UNLICENSED",
+  "keywords": ["agent-tool", "mcp", "preflight", "procedure"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Unfinished compose preflight",
+    "shortDescription": "Generated scaffold left unfinished on purpose so check fails until compareSlot exists.",
+    "longDescription": "Generated scaffold left unfinished on purpose so check fails until compareSlot exists.",
+    "developerName": "openAdam",
+    "category": "Developer Tools",
+    "capabilities": ["Read"],
+    "defaultPrompt": ["Generated scaffold left unfinished on purpose so check fails until compareSlot exists."]
+  }
+}

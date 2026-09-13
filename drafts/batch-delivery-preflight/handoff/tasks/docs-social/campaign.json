@@ -1,0 +1,23 @@
+{
+  "id": "docs-social-2026",
+  "version": "0.1.0",
+  "family": "batch-delivery",
+  "title": "Docs favicon and social cards",
+  "description": "Two favicons plus three social cards. Technical kit list only. Not a visual, brand, copy, or generation review.",
+  "kits": [
+    {
+      "id": "favicons",
+      "kind": "asset-delivery",
+      "required": true,
+      "root": "favicons",
+      "specPath": "kits/favicons.json"
+    },
+    {
+      "id": "social",
+      "kind": "channel-cover",
+      "required": true,
+      "root": "social",
+      "specPath": "kits/social.json"
+    }
+  ]
+}

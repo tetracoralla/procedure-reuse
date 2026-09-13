@@ -1,0 +1,17 @@
+Batch delivery preflight 0.1.0
+Copyright 2026 openAdam
+
+This product includes software developed by openAdam.
+
+The campaign combinator dispatches to the existing draft methods
+asset-delivery-preflight 0.1.0 and channel-cover-preflight 0.1.0 by
+ordinary function import. Those methods remain separate products.
+
+Observation uses the File Vitals capability-jsonl adapter
+(io.github.tetracoralla.file-vitals 0.3.3) to implement
+org.openadam.file.inspect@0.1.0 inspect. File Vitals remains a
+separate product under its own Apache-2.0 license. Slot comparison
+stays in the lower combinators and does not implement
+org.openadam.raster.verify.
+
+See THIRD_PARTY_NOTICES.txt for bundled File Vitals notices.

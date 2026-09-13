@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "openadam.agent-host-tool-integration.v0.2",
+  "displayName": "Unfinished compose preflight",
+  "summary": "Generated scaffold left unfinished on purpose so check fails until compareSlot exists.",
+  "codex": {
+    "marketplaceRoot": "marketplace",
+    "marketplace": "private-unfinished-compose-preflight",
+    "pluginRoot": "marketplace/plugins/unfinished-compose-preflight",
+    "plugin": "unfinished-compose-preflight",
+    "identityFiles": [
+      ".codex-plugin/plugin.json",
+      ".mcp.json",
+      "skills/unfinished-compose-preflight/SKILL.md"
+    ]
+  },
+  "runtime": {
+    "transport": "mcp-stdio",
+    "executor": "suite-node",
+    "command": "marketplace/plugins/unfinished-compose-preflight/runtime/mcp-server.mjs",
+    "args": [],
+    "cwd": "marketplace/plugins/unfinished-compose-preflight",
+    "workspaceEnvironment": [
+      "OPENADAM_CAPABILITY_WORKSPACE_ROOT"
+    ],
+    "expectedTools": [
+      "unfinished_compose_preflight"
+    ],
+    "timeoutMs": 30000
+  },
+  "ownership": {
+    "uninstall": "agent-host-created-only"
+  }
+}

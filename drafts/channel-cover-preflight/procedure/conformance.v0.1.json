@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "openadam.procedure-conformance-suite.v0.4",
+  "procedureId": "org.openadam.channel-cover.preflight",
+  "procedureVersion": "0.1.0",
+  "claimLevel": "result-boundary",
+  "cases": [
+    {
+      "id": "good-delivery-pass",
+      "description": "A complete three-required-slot channel-cover delivery (optional 4x5 absent) that matches the frozen spec reports suite status pass. Observation is file.inspect; comparison is combinator code.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/good",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "pass",
+          "summary": {
+            "failed": 0,
+            "failedIds": []
+          },
+          "extras": [],
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals",
+            "transport": "openadam.capability-jsonl.v0.1"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-required-slot-fail",
+      "description": "The same spec against a delivery missing required cover-9x16.png completes successfully with suite status fail and a missing check. Optional cover-4x5 absence is not missing.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/bad/missing-slot",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedIds": ["missing"]
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals"
+          }
+        }
+      }
+    },
+    {
+      "id": "spec-aspect-change-fail",
+      "description": "The same good files with only cover-16x9 expected aspect changed from 16:9 to 4:3 flip pass to fail. Changing the spec changes execution.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/good",
+        "specPath": "specs/good-wrong-aspect.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedIds": ["aspect"]
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals"
+          }
+        }
+      }
+    },
+    {
+      "id": "transparent-not-allowed-fail",
+      "description": "A transparent 1x1 against transparencyAllowed false completes successfully with suite status fail and a transparency check. This is not raster.verify.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/bad/transparent",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedIds": ["transparency"]
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals"
+          }
+        }
+      }
+    }
+  ]
+}

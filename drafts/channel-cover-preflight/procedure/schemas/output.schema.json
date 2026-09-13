@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openadam:procedure:channel-cover.preflight:v0.1:output",
+  "title": "Channel cover preflight output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "spec", "root", "workspaceRoot", "observer", "slots", "extras", "checks", "summary"],
+  "properties": {
+    "status": { "enum": ["pass", "fail"] },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "path"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "version": { "type": ["string", "null"] },
+        "path": { "type": ["string", "null"] }
+      }
+    },
+    "root": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "workspaceRoot": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "observer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "operation", "provider", "transport", "adapter", "note"],
+      "properties": {
+        "capability": { "const": "org.openadam.file.inspect@0.1.0" },
+        "operation": { "const": "inspect" },
+        "provider": { "const": "io.github.tetracoralla.file-vitals" },
+        "transport": { "const": "openadam.capability-jsonl.v0.1" },
+        "adapter": { "type": ["string", "null"], "minLength": 1, "maxLength": 4096 },
+        "note": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "slots": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "present", "required"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+          "present": { "type": "boolean" },
+          "required": { "type": "boolean" },
+          "inspectError": { "type": ["object", "null"] },
+          "file": { "type": ["object", "null"] },
+          "identity": { "type": ["object", "null"] },
+          "image": { "type": ["object", "null"] }
+        }
+      }
+    },
+    "extras": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "type": "string", "minLength": 1, "maxLength": 4096 }
+    },
+    "checks": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "passed", "expected", "observed"],
+        "properties": {
+          "id": { "enum": ["namePattern", "format", "width", "height", "aspect", "transparency", "missing", "extra"] },
+          "passed": { "type": "boolean" },
+          "expected": { "type": ["string", "integer", "boolean", "null"] },
+          "observed": { "type": ["string", "integer", "boolean", "null"] },
+          "slot": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+          "error": { "type": ["object", "null"] }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slots", "files", "checks", "passed", "failed", "failedIds"],
+      "properties": {
+        "slots": { "type": "integer", "minimum": 0 },
+        "files": { "type": "integer", "minimum": 0 },
+        "checks": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "failedIds": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "enum": ["namePattern", "format", "width", "height", "aspect", "transparency", "missing", "extra"] }
+        }
+      }
+    }
+  }
+}

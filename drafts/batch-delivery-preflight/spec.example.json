@@ -1,0 +1,23 @@
+{
+  "id": "campaign-good",
+  "version": "0.1.0",
+  "family": "batch-delivery",
+  "title": "Two-kit delivery campaign",
+  "description": "Icon suite plus channel-cover suite. Technical kit list only. Not a visual, brand, copy, or generation review.",
+  "kits": [
+    {
+      "id": "icons",
+      "kind": "asset-delivery",
+      "required": true,
+      "root": "icons",
+      "specPath": "kits/asset-delivery.good.json"
+    },
+    {
+      "id": "covers",
+      "kind": "channel-cover",
+      "required": true,
+      "root": "covers",
+      "specPath": "kits/channel-cover.good.json"
+    }
+  ]
+}

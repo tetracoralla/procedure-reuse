@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "openadam.agent-host-tool-integration.v0.2",
+  "displayName": "Batch delivery preflight",
+  "summary": "Read-only two-layer preflight: dispatch each campaign kit to asset-delivery-preflight or channel-cover-preflight. Observation is file.inspect. Does not implement raster.verify.",
+  "codex": {
+    "marketplaceRoot": "marketplace",
+    "marketplace": "private-batch-delivery-preflight",
+    "pluginRoot": "marketplace/plugins/batch-delivery-preflight",
+    "plugin": "batch-delivery-preflight",
+    "identityFiles": [
+      ".codex-plugin/plugin.json",
+      ".mcp.json",
+      "skills/batch-delivery-preflight/SKILL.md"
+    ]
+  },
+  "runtime": {
+    "transport": "mcp-stdio",
+    "executor": "suite-node",
+    "command": "marketplace/plugins/batch-delivery-preflight/runtime/mcp-server.mjs",
+    "args": [],
+    "cwd": "marketplace/plugins/batch-delivery-preflight",
+    "workspaceEnvironment": [
+      "OPENADAM_CAPABILITY_WORKSPACE_ROOT"
+    ],
+    "expectedTools": [
+      "batch_delivery_preflight"
+    ],
+    "timeoutMs": 30000
+  },
+  "ownership": {
+    "uninstall": "agent-host-created-only"
+  }
+}

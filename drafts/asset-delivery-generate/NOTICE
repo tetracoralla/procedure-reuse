@@ -1,0 +1,16 @@
+Asset delivery generate 0.1.0
+Copyright 2026 openAdam
+
+This product includes software developed by openAdam.
+
+Generation is ordinary local PNG decode / cover-crop / downscale / encode.
+It does not implement org.openadam.raster.prepare, does not implement
+org.openadam.brand-asset.prepare, and does not bind the unpublished
+asset-prep provider.
+
+After writing a new output directory, this draft calls the existing
+asset-delivery-preflight 0.1.0 combinator by ordinary function import.
+Slot comparison stays in that module. Observation uses the File Vitals
+capability-jsonl adapter (io.github.tetracoralla.file-vitals 0.3.3) to
+implement org.openadam.file.inspect@0.1.0 inspect. File Vitals remains a
+separate product under its own Apache-2.0 license.

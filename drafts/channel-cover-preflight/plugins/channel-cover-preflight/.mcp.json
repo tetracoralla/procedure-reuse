@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "channel-cover-preflight": {
+      "command": "node",
+      "args": ["./runtime/mcp-server.mjs"],
+      "cwd": "."
+    }
+  }
+}

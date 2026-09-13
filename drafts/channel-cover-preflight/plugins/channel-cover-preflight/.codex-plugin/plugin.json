@@ -1,0 +1,21 @@
+{
+  "name": "channel-cover-preflight",
+  "version": "0.1.0",
+  "description": "Read-only preflight for channel-cover slots using file.inspect observations and combinator comparison. Does not implement raster.verify.",
+  "author": {
+    "name": "openAdam"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["agent-tool", "mcp", "preflight", "procedure"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Channel cover preflight",
+    "shortDescription": "Read-only preflight for channel-cover slots using file.inspect observations and combinator co...",
+    "longDescription": "Read-only preflight for channel-cover slots using file.inspect observations and combinator comparison. Does not implement raster.verify.",
+    "developerName": "openAdam",
+    "category": "Developer Tools",
+    "capabilities": ["Read"],
+    "defaultPrompt": ["Read-only preflight for channel-cover slots using file.inspect observations and combinator comparison. Does not implement ras..."]
+  }
+}

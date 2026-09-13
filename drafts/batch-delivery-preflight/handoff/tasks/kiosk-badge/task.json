@@ -1,0 +1,12 @@
+{
+  "id": "kiosk-badge",
+  "title": "Kiosk badge + poster set",
+  "whyDifferent": "New slot names (badge-24/48/96, plate, poster-*), new sizes (24/48/96/200x80 and 80/192x108/108x192), flat kit roots, two new kit ids. Not a rename of fixtures/good.",
+  "spec": "campaign.json",
+  "root": "delivery",
+  "expect": {
+    "status": "pass",
+    "failedKits": [],
+    "failedIds": []
+  }
+}

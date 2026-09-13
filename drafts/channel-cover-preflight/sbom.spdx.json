@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "channel-cover-preflight-0.1.0",
+  "documentNamespace": "https://openadam.org/spdx/channel-cover-preflight/0.1.0",
+  "creationInfo": {
+    "created": "2026-09-12T00:00:00Z",
+    "creators": [
+      "Person: Milestone 2 draft"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-RootPackage",
+      "name": "channel-cover-preflight",
+      "versionInfo": "0.1.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "SPDXID": "SPDXRef-FileVitalsAdapter",
+      "name": "io.github.tetracoralla.file-vitals",
+      "versionInfo": "0.3.3",
+      "downloadLocation": "https://github.com/tetracoralla/file-vitals",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0",
+      "comment": "Bundled capability-jsonl inspect adapter only. Not a raster.verify provider."
+    }
+  ]
+}

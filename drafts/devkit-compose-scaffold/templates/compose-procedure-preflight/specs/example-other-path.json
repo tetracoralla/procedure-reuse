@@ -1,0 +1,13 @@
+{
+  "id": "scaffold-example-other-path",
+  "version": "0.1.0",
+  "title": "Scaffold example spec with a different required path",
+  "description": "Same empty fixture; only the required path changed. Used to prove the spec file is not decoration.",
+  "slots": [
+    {
+      "id": "slot-a",
+      "path": "other.png",
+      "required": true
+    }
+  ]
+}

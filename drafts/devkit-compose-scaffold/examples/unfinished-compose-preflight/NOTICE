@@ -1,0 +1,7 @@
+Unfinished compose preflight 0.1.0
+Copyright holder and notice terms require owner review before distribution.
+
+Observation uses the File Vitals capability-jsonl adapter
+(io.github.tetracoralla.file-vitals) to implement
+org.openadam.file.inspect@0.1.0 inspect. Comparison is ordinary combinator
+code in this project and does not implement org.openadam.raster.verify.

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "asset-delivery-preflight": {
+      "command": "node",
+      "args": [
+        "./runtime/mcp-server.mjs"
+      ],
+      "cwd": "."
+    }
+  }
+}

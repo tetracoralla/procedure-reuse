@@ -1,0 +1,29 @@
+{
+  "name": "asset-delivery-preflight",
+  "version": "0.1.0",
+  "description": "Read-only suite preflight for asset-delivery slots using file.inspect observations and combinator comparison.",
+  "author": {
+    "name": "openAdam"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "agent-tool",
+    "mcp",
+    "preflight"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Asset delivery preflight",
+    "shortDescription": "Read-only slot-set preflight using file.inspect. Not raster.verify.",
+    "longDescription": "Read-only suite preflight for asset-delivery slots using file.inspect observations and combinator comparison.",
+    "developerName": "openAdam",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": [
+      "Preflight this asset delivery directory against the slot spec."
+    ]
+  }
+}

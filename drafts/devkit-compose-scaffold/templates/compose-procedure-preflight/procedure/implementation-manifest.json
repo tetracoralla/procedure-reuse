@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "openadam.procedure-implementation-manifest.v0.5",
+  "provider": {
+    "id": __PROJECT_ID_JSON__,
+    "name": __DISPLAY_NAME_JSON__,
+    "version": "0.1.0"
+  },
+  "implementations": [
+    {
+      "procedureId": __PROCEDURE_ID_JSON__,
+      "procedureVersion": "0.1.0",
+      "profileDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "adapter": {
+        "protocol": "openadam.procedure-jsonl.v0.2",
+        "command": "node",
+        "args": ["procedure/adapter.mjs"]
+      },
+      "binding": {
+        "kind": "cli",
+        "target": "procedure/adapter.mjs"
+      },
+      "contractSchemaDigests": {
+        "input": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "output": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "stages": [
+        {
+          "stageId": "inspect-files",
+          "capabilityId": "org.openadam.file.inspect",
+          "capabilityVersion": "0.1.0",
+          "operationId": "inspect",
+          "provider": {
+            "id": "io.github.tetracoralla.file-vitals",
+            "name": "File Vitals",
+            "version": "0.3.3",
+            "homepage": "https://github.com/tetracoralla/file-vitals"
+          },
+          "transport": "capability-jsonl",
+          "target": "cmd/capability-adapter#inspect"
+        }
+      ]
+    }
+  ]
+}
