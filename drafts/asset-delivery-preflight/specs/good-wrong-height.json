@@ -1,0 +1,74 @@
+{
+  "id": "app-icon-delivery",
+  "version": "0.1.0-wrong-height",
+  "title": "Same delivery slots with one height changed",
+  "description": "Identical to specs/good.json except og-cover.height is 361. Used to prove a spec edit changes the preflight result on the same files.",
+  "alphaPolicy": {
+    "present": "Pass only when File Vitals JSONL inspect reports image.has_alpha === true. Omitted has_alpha is observed as unknown and is not present.",
+    "absent": "Pass only when File Vitals JSONL inspect reports image.has_alpha === false. Omitted has_alpha is observed as unknown and is not absent.",
+    "any": "Do not fail the alpha check, including when has_alpha is omitted.",
+    "unknown": "Pass only when has_alpha is omitted. Do not invent present or absent."
+  },
+  "slots": [
+    {
+      "id": "icon-16",
+      "path": "icon-16.png",
+      "name": "icon-16.png",
+      "format": "png",
+      "width": 16,
+      "height": 16,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "icon-32",
+      "path": "icon-32.png",
+      "name": "icon-32.png",
+      "format": "png",
+      "width": 32,
+      "height": 32,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "icon-64",
+      "path": "icon-64.png",
+      "name": "icon-64.png",
+      "format": "png",
+      "width": 64,
+      "height": 64,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "icon-128",
+      "path": "icon-128.png",
+      "name": "icon-128.png",
+      "format": "png",
+      "width": 128,
+      "height": 128,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "wordmark",
+      "path": "wordmark.png",
+      "name": "wordmark.png",
+      "format": "png",
+      "width": 320,
+      "height": 64,
+      "alpha": "absent",
+      "required": true
+    },
+    {
+      "id": "og-cover",
+      "path": "og-cover.png",
+      "name": "og-cover.png",
+      "format": "png",
+      "width": 640,
+      "height": 361,
+      "alpha": "absent",
+      "required": true
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "channel-cover-delivery",
+  "version": "0.1.0",
+  "family": "channel-cover",
+  "title": "Channel cover delivery with mutated 1x1 width",
+  "description": "Same files as good. Only cover-1x1 expected width changed from 64 to 65.",
+  "naming": {
+    "pattern": "^cover-(1x1|16x9|9x16|4x5)\\.(png|jpe?g)$"
+  },
+  "transparencyAllowed": false,
+  "slots": [
+    {
+      "id": "cover-1x1",
+      "path": "covers/cover-1x1.png",
+      "aspect": "1:1",
+      "format": "png",
+      "width": 65,
+      "height": 64,
+      "required": true
+    },
+    {
+      "id": "cover-16x9",
+      "path": "covers/cover-16x9.jpg",
+      "aspect": "16:9",
+      "format": "jpeg",
+      "width": 160,
+      "height": 90,
+      "required": true
+    },
+    {
+      "id": "cover-9x16",
+      "path": "covers/cover-9x16.png",
+      "aspect": "9:16",
+      "format": "png",
+      "width": 90,
+      "height": 160,
+      "required": true
+    },
+    {
+      "id": "cover-4x5",
+      "path": "covers/cover-4x5.png",
+      "aspect": "4:5",
+      "format": "png",
+      "width": 80,
+      "height": 100,
+      "required": false
+    }
+  ]
+}

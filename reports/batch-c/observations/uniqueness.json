@@ -1,0 +1,123 @@
+{
+  "newFiles": 23,
+  "oldImageFilesHashed": 120,
+  "sha256Overlap": 0,
+  "collisions": [],
+  "files": [
+    {
+      "path": "reports/batch-c/task/delivery/app-tiles/lockup.png",
+      "sha256": "5e645f40e1dbc5c5179e3ef7f0f0bce6c8e80f38b73d7cf2b1dfaacad04bf508",
+      "bytes": 194
+    },
+    {
+      "path": "reports/batch-c/task/delivery/app-tiles/tile-20.png",
+      "sha256": "aaebb9be79bee932f56ab121f8f738fbfd7d00809171459bc617515113176a0b",
+      "bytes": 136
+    },
+    {
+      "path": "reports/batch-c/task/delivery/app-tiles/tile-40.png",
+      "sha256": "253bce7b36d8d705cfb7689302a168e46c4826d8971d024d9466e2a8a68d3b40",
+      "bytes": 163
+    },
+    {
+      "path": "reports/batch-c/task/delivery/app-tiles/tile-80.png",
+      "sha256": "9d44c404d3f09166efa3a47d4197110a1a4f2ea32f976d1bd2f5f65e6a53cf1f",
+      "bytes": 232
+    },
+    {
+      "path": "reports/batch-c/task/delivery/station-boards/board-square.png",
+      "sha256": "4ce66b58d456a2db9f8609ffe84a4777e62cdb015b7e6aa0b81559d892335046",
+      "bytes": 235
+    },
+    {
+      "path": "reports/batch-c/task/delivery/station-boards/board-tall.png",
+      "sha256": "a8ceb09621be5af5efab45732a15813c9f848db6f6d8da539fdf0d1d2d15dcc7",
+      "bytes": 258
+    },
+    {
+      "path": "reports/batch-c/task/delivery/station-boards/board-wide.jpg",
+      "sha256": "0cbb6b2a473523a9efa9bd44e7a0bb1c947f429b58e6b8150d42908feb973ce3",
+      "bytes": 295
+    },
+    {
+      "path": "reports/batch-c/task/delivery-fixed/app-tiles/lockup.png",
+      "sha256": "5e645f40e1dbc5c5179e3ef7f0f0bce6c8e80f38b73d7cf2b1dfaacad04bf508",
+      "bytes": 194
+    },
+    {
+      "path": "reports/batch-c/task/delivery-fixed/app-tiles/tile-20.png",
+      "sha256": "aaebb9be79bee932f56ab121f8f738fbfd7d00809171459bc617515113176a0b",
+      "bytes": 136
+    },
+    {
+      "path": "reports/batch-c/task/delivery-fixed/app-tiles/tile-40.png",
+      "sha256": "253bce7b36d8d705cfb7689302a168e46c4826d8971d024d9466e2a8a68d3b40",
+      "bytes": 163
+    },
+    {
+      "path": "reports/batch-c/task/delivery-fixed/app-tiles/tile-80.png",
+      "sha256": "9d44c404d3f09166efa3a47d4197110a1a4f2ea32f976d1bd2f5f65e6a53cf1f",
+      "bytes": 232
+    },
+    {
+      "path": "reports/batch-c/task/delivery-fixed/station-boards/board-square.png",
+      "sha256": "4ce66b58d456a2db9f8609ffe84a4777e62cdb015b7e6aa0b81559d892335046",
+      "bytes": 235
+    },
+    {
+      "path": "reports/batch-c/task/delivery-fixed/station-boards/board-tall.png",
+      "sha256": "a8ceb09621be5af5efab45732a15813c9f848db6f6d8da539fdf0d1d2d15dcc7",
+      "bytes": 258
+    },
+    {
+      "path": "reports/batch-c/task/delivery-fixed/station-boards/board-wide.jpg",
+      "sha256": "c71a064692f8b33f2f3ca6b04055ddb0049cb0c0e33b3fb835c89a8c1bf8b6a6",
+      "bytes": 295
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/app-tiles/lockup.png",
+      "sha256": "5e645f40e1dbc5c5179e3ef7f0f0bce6c8e80f38b73d7cf2b1dfaacad04bf508",
+      "bytes": 194
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/app-tiles/tile-120.png",
+      "sha256": "fbf57ebc73c0d4d598dc6f60264c399cd327d6dfb26d2835a1bfe83cf6054bae",
+      "bytes": 311
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/app-tiles/tile-20.png",
+      "sha256": "aaebb9be79bee932f56ab121f8f738fbfd7d00809171459bc617515113176a0b",
+      "bytes": 136
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/app-tiles/tile-40.png",
+      "sha256": "253bce7b36d8d705cfb7689302a168e46c4826d8971d024d9466e2a8a68d3b40",
+      "bytes": 163
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/app-tiles/tile-80.png",
+      "sha256": "9d44c404d3f09166efa3a47d4197110a1a4f2ea32f976d1bd2f5f65e6a53cf1f",
+      "bytes": 232
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/station-boards/board-square.png",
+      "sha256": "4ce66b58d456a2db9f8609ffe84a4777e62cdb015b7e6aa0b81559d892335046",
+      "bytes": 235
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/station-boards/board-tall.png",
+      "sha256": "a8ceb09621be5af5efab45732a15813c9f848db6f6d8da539fdf0d1d2d15dcc7",
+      "bytes": 258
+    },
+    {
+      "path": "reports/batch-c/task/delivery-v2/station-boards/board-wide.jpg",
+      "sha256": "c71a064692f8b33f2f3ca6b04055ddb0049cb0c0e33b3fb835c89a8c1bf8b6a6",
+      "bytes": 295
+    },
+    {
+      "path": "reports/batch-c/task/source/tile-master-256.png",
+      "sha256": "bce0fd858cfb386c0a30068b32c969b557ad9e1ef3181f889fdb835a47f4b398",
+      "bytes": 1362
+    }
+  ]
+}

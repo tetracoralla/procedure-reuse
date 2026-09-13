@@ -1,0 +1,10 @@
+## good
+pass {'slots': 4, 'files': 3, 'checks': 18, 'passed': 18, 'failed': 0, 'failedIds': []}
+## good-wrong-aspect
+fail {'slots': 4, 'files': 3, 'checks': 18, 'passed': 17, 'failed': 1, 'failedIds': ['aspect']}
+[{'id': 'aspect', 'passed': False, 'expected': '4:3', 'observed': '16:9', 'slot': 'cover-16x9', 'path': 'covers/cover-16x9.jpg'}]
+## transparency flip
+forbidden fail ['transparency']
+allowed pass []
+## missing
+fail ['missing']

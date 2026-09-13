@@ -1,0 +1,49 @@
+{
+  "id": "docs-social-cards",
+  "version": "0.1.0",
+  "family": "channel-cover",
+  "title": "Docs social cards",
+  "description": "Square, wide, and tall social cards. Optional 4:5 portrait may be absent. Technical slot list only.",
+  "naming": {
+    "pattern": "^card-(square|wide|tall|portrait)\\.(png|jpe?g)$"
+  },
+  "transparencyAllowed": false,
+  "slots": [
+    {
+      "id": "card-square",
+      "path": "card-square.png",
+      "aspect": "1:1",
+      "format": "png",
+      "width": 72,
+      "height": 72,
+      "required": true
+    },
+    {
+      "id": "card-wide",
+      "path": "card-wide.jpg",
+      "aspect": "16:9",
+      "format": "jpeg",
+      "width": 176,
+      "height": 99,
+      "required": true
+    },
+    {
+      "id": "card-tall",
+      "path": "card-tall.png",
+      "aspect": "9:16",
+      "format": "png",
+      "width": 99,
+      "height": 176,
+      "required": true
+    },
+    {
+      "id": "card-portrait",
+      "path": "card-portrait.png",
+      "aspect": "4:5",
+      "format": "png",
+      "width": 80,
+      "height": 100,
+      "required": false
+    }
+  ]
+}

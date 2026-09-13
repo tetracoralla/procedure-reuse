@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-12",
+  "node": "v20.19.2",
+  "tests": {
+    "command": "node --test src/generate.test.mjs",
+    "passed": 9,
+    "failed": 0
+  },
+  "cli": {
+    "good": {
+      "source": "fixtures/source/master-256.png",
+      "spec": "specs/icons.json",
+      "status": "pass",
+      "stage": "preflight",
+      "failedIds": [],
+      "observer": "org.openadam.file.inspect@0.1.0",
+      "slots": [
+        { "id": "icon-16", "width": 16, "height": 16 },
+        { "id": "icon-32", "width": 32, "height": 32 },
+        { "id": "icon-64", "width": 64, "height": 64 },
+        { "id": "icon-128", "width": 128, "height": 128 }
+      ]
+    },
+    "tooSmall": {
+      "source": "fixtures/source/too-small-32.png",
+      "spec": "specs/icons.json",
+      "status": "fail",
+      "stage": "generate",
+      "failedIds": ["sourceTooSmall"],
+      "slots": ["icon-64", "icon-128"],
+      "wroteFiles": false
+    },
+    "specWidthChange": {
+      "spec": "specs/icons-64-as-48.json",
+      "generatedIcon64": { "width": 48, "height": 48 },
+      "preflightAgainstIconsJson": {
+        "status": "fail",
+        "failedIds": ["width", "height"],
+        "slot": "icon-64",
+        "expected": 64,
+        "observed": 48
+      }
+    },
+    "fullSixSlotSpecOn256": {
+      "spec": "../asset-delivery-preflight/specs/good.json",
+      "status": "fail",
+      "stage": "generate",
+      "failedIds": ["sourceTooSmall"],
+      "slots": ["wordmark", "og-cover"],
+      "note": "wordmark 320×64 and og-cover 640×360 need a larger source; this generator does not upscale and does not invent brand/cover art."
+    }
+  },
+  "notClaimed": [
+    "org.openadam.raster.prepare",
+    "org.openadam.brand-asset.prepare",
+    "asset-prep",
+    "org.openadam.raster.verify"
+  ]
+}

@@ -1,0 +1,226 @@
+{
+  "root": "/workspace/openadam-procedure-reuse/drafts/channel-cover-preflight",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "9b75cd7b069cf9533997f706fb2d47675ddc6cd201050885153d8287b55a7003",
+      "bytes": 65
+    },
+    {
+      "path": ".openadam-scaffold",
+      "sha256": "62dca8cc64a979beb2093232433176b12fcc92de156d02571164b3d421a32a93",
+      "bytes": 343
+    },
+    {
+      "path": "agent-tool.json",
+      "sha256": "806b0880421be8f4b8e3bcedf7e49a96342e6b51a3bb3ab435fe543bba945776",
+      "bytes": 2376
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "19bd92bd8c889c98bcbc4bc659c530affefa0d19a7b1e30a77269e6808557c30",
+      "bytes": 979
+    },
+    {
+      "path": "docs/AUTHORING.md",
+      "sha256": "c690cabbed7ae94a496646a748680df32dabc4e52f48987161083b2515e9be0e",
+      "bytes": 1325
+    },
+    {
+      "path": "docs/PRODUCT_MODEL.md",
+      "sha256": "9917bd1aacbaf01e30db0bb764e14a32783cb08773004bca8306942971001b57",
+      "bytes": 2089
+    },
+    {
+      "path": "docs/REVIEW_CONTRACT.md",
+      "sha256": "96a0327ad0f164842049118e20127ba1ed20b3c935ab5836b6165e51189f1b5e",
+      "bytes": 1092
+    },
+    {
+      "path": "fixtures/empty/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    {
+      "path": "lib/check-record.mjs",
+      "sha256": "3f4c694d58970e8c040e8ee4229a1e5ffd02a5cc2d79d8e15864047e5ae0ad3a",
+      "bytes": 286
+    },
+    {
+      "path": "lib/list-delivery-files.mjs",
+      "sha256": "90b59d184b835f5053714f1f836480e087f0e8b39bc9c06b8a67fafd49e7990f",
+      "bytes": 751
+    },
+    {
+      "path": "lib/observe-file-inspect.mjs",
+      "sha256": "5870e2ea741c6e2f2097be9767f361999e0af4abddba38471fb5ae259c567c34",
+      "bytes": 5803
+    },
+    {
+      "path": "lib/spec-base.mjs",
+      "sha256": "28adafd9c8fe67af4a825236a3bfa501d5759211598200a091fce61eadacbefe",
+      "bytes": 3017
+    },
+    {
+      "path": "lib/workspace.mjs",
+      "sha256": "901f26af544151ccd34ff20a53be0f0c1443fee85005a495377cdccf2e537eaa",
+      "bytes": 727
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "e9da068c9bda386a2f1007b0cdb5a4393e3d32908042d530167041fa1af27293",
+      "bytes": 217
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "6a481fe123f7f9f89f809eb2c9ba9d87b9e50c2e8326ea54406d623fe0dfdfaa",
+      "bytes": 362
+    },
+    {
+      "path": "packaging/agent-host-integration.json",
+      "sha256": "0807897607f5ebffc9dd9252c4e14f02ce52d7e9db2b6fb6df58aa86e4f941cf",
+      "bytes": 1040
+    },
+    {
+      "path": "plugins/channel-cover-preflight/.codex-plugin/plugin.json",
+      "sha256": "1f196e3e99a7ad33fa744c3632e4bb4f0b9cf55ea26144568647f438988becc2",
+      "bytes": 1014
+    },
+    {
+      "path": "plugins/channel-cover-preflight/.mcp.json",
+      "sha256": "e8f668f7391325cbe172d66ba1b5d763e0a22287274724f7b55c37ff0ed16dda",
+      "bytes": 151
+    },
+    {
+      "path": "plugins/channel-cover-preflight/skills/channel-cover-preflight/SKILL.md",
+      "sha256": "5bb799409c8849fa338c2a4b5745fac005a20aa4d3aea0e1fd17eb4c62773934",
+      "bytes": 1261
+    },
+    {
+      "path": "procedure/adapter.mjs",
+      "sha256": "a854e417514cfed69e9cb07da6efc21cf97b0a9f419c1b8b5c18c6d698776c24",
+      "bytes": 7471
+    },
+    {
+      "path": "procedure/check.mjs",
+      "sha256": "0b08538058a3d4e9062caa7cbe621fdbd3a140964c0979762a4c369bb8ea4b2b",
+      "bytes": 3887
+    },
+    {
+      "path": "procedure/conformance.v0.1.json",
+      "sha256": "5f96b9daab7b01c9a7a5d9e5f16e4fafa3167204edd0a53eaa99756ae16bd2f9",
+      "bytes": 1105
+    },
+    {
+      "path": "procedure/implementation-manifest.json",
+      "sha256": "db3234ab8a8938b504dcdd2dd1e34a572f0c3e4bbae46e612f33b9a60f8d9bee",
+      "bytes": 1470
+    },
+    {
+      "path": "procedure/profile.v0.1.json",
+      "sha256": "37a9ac9c6c6b6620102c3d32719b6dbd6a213742043487a116eb728f6125c7da",
+      "bytes": 3012
+    },
+    {
+      "path": "procedure/README.md",
+      "sha256": "ba16e1ae5aab3a0f920442f0104647d81aae0fa17928c7c2965a34076926e09d",
+      "bytes": 648
+    },
+    {
+      "path": "procedure/schemas/input.schema.json",
+      "sha256": "7d0bef3b43db4ff1ddf338d976032090b19187f25174bc548ad5557d446e52c2",
+      "bytes": 1815
+    },
+    {
+      "path": "procedure/schemas/output.schema.json",
+      "sha256": "3d1475fce09697b23fc571eae4bc7318c42cc69b7284055fb465884bce86e8b0",
+      "bytes": 3727
+    },
+    {
+      "path": "README.md",
+      "sha256": "e178b24ac5e22878aacb28816beef11aad3353f59d14fc10ffe45c56dae6afc2",
+      "bytes": 1108
+    },
+    {
+      "path": "sbom.spdx.json",
+      "sha256": "d2ee078e35bb0e09040fefd7bc42a77068715ce487bcd0c3d319e436a001d548",
+      "bytes": 684
+    },
+    {
+      "path": "scripts/build-file-vitals.sh",
+      "sha256": "7341fae6a7478da5f283fa37bdcb37b359ca0e500f1189787c7f13d2a071fcc4",
+      "bytes": 2031
+    },
+    {
+      "path": "scripts/kit-development-check.mjs",
+      "sha256": "bb0e801b77280d34277d3baa97c858e08774580fd1832e4583415f6984d67c71",
+      "bytes": 2424
+    },
+    {
+      "path": "scripts/package-component.mjs",
+      "sha256": "637dd6bade3e400ebe0cf4645c79eb0e216db31f6023feb27a36cf3a54113f4f",
+      "bytes": 3298
+    },
+    {
+      "path": "scripts/run-procedure-conformance.sh",
+      "sha256": "ffc4919bcf86943c9183b72f9fa380c7e1594b80e05763a72138f9dbea2a82c6",
+      "bytes": 1996
+    },
+    {
+      "path": "scripts/write-procedure-digests.mjs",
+      "sha256": "af399d90338c8f94c59a6e80dff4772b37c7297149a38a3fbfde9a37f647dc07",
+      "bytes": 1751
+    },
+    {
+      "path": "specs/example-other-path.json",
+      "sha256": "0fc46233422c7f914df71357e5ba5cb0cda2db0efc95a49ce2c28257426ef4c4",
+      "bytes": 352
+    },
+    {
+      "path": "specs/example.json",
+      "sha256": "8150e1a0e2514bf93555efc360c81ca87ca69f261a54032bfb56b8fa006d4819",
+      "bytes": 271
+    },
+    {
+      "path": "src/cli.mjs",
+      "sha256": "21629b1f4be392823ca364044bc8fa805d2eba578623c3759cccfb14f831cbc7",
+      "bytes": 3139
+    },
+    {
+      "path": "src/compare.mjs",
+      "sha256": "92854e0300679d7dee18b708b0a86eb658d7de5f767767728c6d300100d80e62",
+      "bytes": 824
+    },
+    {
+      "path": "src/mcp-server.mjs",
+      "sha256": "53fe40679167e9eb5e2cb0e1b4d81a87e182a09b3b76f0960997b750e66ba156",
+      "bytes": 10633
+    },
+    {
+      "path": "src/mcp-server.test.mjs",
+      "sha256": "11e89103163adb9aa165243792cb7175e42070329ad1b98a9e19a3df6aa81d1e",
+      "bytes": 826
+    },
+    {
+      "path": "src/preflight.mjs",
+      "sha256": "efa6ea40ac0f7fe51bec23ab952a7d4b7fe5ebe1609420a9d0fe6210b5d2eb4f",
+      "bytes": 3299
+    },
+    {
+      "path": "src/preflight.test.mjs",
+      "sha256": "656dde572d0f4435c0752d3d67ff05a21bee78df1c7d5e8237ad058a2ecc1064",
+      "bytes": 2137
+    },
+    {
+      "path": "src/spec.mjs",
+      "sha256": "5d7071c018980c8a6b410a0f0c81b832dce87482639917b7ec5b4c24a50b6b9d",
+      "bytes": 789
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.txt",
+      "sha256": "2cc318b038ae3f5f94bcdc9aa4049d88532af33e122614adc5b3dc71afcadd20",
+      "bytes": 388
+    }
+  ],
+  "count": 44
+}

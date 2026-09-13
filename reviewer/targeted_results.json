@@ -1,0 +1,82 @@
+{
+  "sourceRevision": "0ea5124b3787cea4f7aa6349aea9a0e95da60bc5",
+  "node": "v22.16.0",
+  "platform": "linux",
+  "methodology": "Isolated reproductions using transcribed code excerpts and real temporary filesystem operations. Not an original checkout, full CLI/MCP execution, or repository regression run.",
+  "fullRepositoryTestsRun": false,
+  "observations": [
+    {
+      "id": "source-overwrite-via-directory-alias",
+      "reproduced": true,
+      "scope": "filesystem excerpt",
+      "overwrite": true,
+      "sourceChanged": true
+    },
+    {
+      "id": "default-write-follows-dangling-link",
+      "reproduced": true,
+      "scope": "filesystem excerpt",
+      "overwrite": false,
+      "wroteOutsideOutputRoot": true
+    },
+    {
+      "id": "partial-output-on-io-failure",
+      "reproduced": true,
+      "scope": "filesystem excerpt",
+      "error": "EEXIST",
+      "firstOutputRemains": true
+    },
+    {
+      "id": "nested-kit-grant-expands-outside-parent",
+      "reproduced": true,
+      "scope": "batch preflight path excerpt; no full MCP/real File Vitals run",
+      "childGrantOutsideOriginalGrant": true
+    },
+    {
+      "id": "hidden-rgb-contaminates-resampling",
+      "reproduced": true,
+      "scope": "resampleArea algorithm",
+      "observedRGBA": [
+        128,
+        0,
+        128,
+        128
+      ],
+      "premultipliedBoxExpectedRGBA": [
+        255,
+        0,
+        0,
+        128
+      ]
+    },
+    {
+      "id": "fractional-area-filter-is-not-area-weighted",
+      "reproduced": true,
+      "scope": "resampleArea algorithm",
+      "observedRGB": [
+        0,
+        0,
+        0,
+        128,
+        128,
+        128
+      ],
+      "boxAreaExpectedRGB": [
+        85,
+        85,
+        85,
+        85,
+        85,
+        85
+      ]
+    },
+    {
+      "id": "inflate-allocates-before-image-length-check",
+      "reproduced": true,
+      "scope": "Node zlib behavior used by decodePng; not full decoder test",
+      "compressedBytes": 1039,
+      "allocatedOutputBytes": 1048576,
+      "smallLimitError": "ERR_BUFFER_TOO_LARGE"
+    }
+  ]
+}

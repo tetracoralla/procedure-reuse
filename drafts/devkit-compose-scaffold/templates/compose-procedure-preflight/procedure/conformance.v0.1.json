@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "openadam.procedure-conformance-suite.v0.4",
+  "procedureId": __PROCEDURE_ID_JSON__,
+  "procedureVersion": "0.1.0",
+  "claimLevel": "result-boundary",
+  "cases": [
+    {
+      "id": "empty-delivery-missing-slot",
+      "description": "Scaffold mechanical case: an empty delivery against the example spec completes successfully with suite status fail and a missing check. Replace this suite with product fixtures after compareSlot is implemented. Changing the spec slot path still changes which path is reported missing.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/empty",
+        "specPath": "specs/example.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedIds": ["missing"]
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals"
+          }
+        }
+      }
+    }
+  ]
+}

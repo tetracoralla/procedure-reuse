@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "openadam.procedure-conformance-suite.v0.4",
+  "procedureId": "org.openadam.asset-delivery.preflight",
+  "procedureVersion": "0.1.0",
+  "claimLevel": "result-boundary",
+  "cases": [
+    {
+      "id": "good-delivery-pass",
+      "description": "A complete six-slot PNG delivery that matches the frozen spec reports suite status pass. Observation is file.inspect; comparison is combinator code.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/good",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "pass",
+          "summary": {
+            "failed": 0,
+            "failedIds": []
+          },
+          "extras": [],
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals",
+            "transport": "openadam.capability-jsonl.v0.1"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-required-slot-fail",
+      "description": "The same spec against a delivery missing required icon-128.png completes successfully with suite status fail and a missing check. A missing slot is not a Procedure error.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/bad/missing-slot",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedIds": ["missing"]
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals"
+          }
+        }
+      }
+    },
+    {
+      "id": "wrong-size-fail",
+      "description": "The same spec against a delivery whose icon-64.png is 48x48 completes successfully with suite status fail and width plus height check ids.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/bad/wrong-size",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedIds": ["width", "height"]
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals"
+          }
+        }
+      }
+    },
+    {
+      "id": "spec-height-change-fail",
+      "description": "The same good files with only og-cover expected height changed from 360 to 361 flip pass to fail. Changing the spec changes execution.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/good",
+        "specPath": "specs/good-wrong-height.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedIds": ["height"]
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals"
+          }
+        }
+      }
+    }
+  ]
+}

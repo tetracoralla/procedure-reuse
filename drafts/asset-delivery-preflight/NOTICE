@@ -1,0 +1,14 @@
+Asset delivery preflight 0.1.0
+Copyright 2026 openAdam
+
+This product includes software developed by openAdam.
+
+Observation uses the File Vitals capability-jsonl adapter
+(io.github.tetracoralla.file-vitals 0.3.3) to implement
+org.openadam.file.inspect@0.1.0 inspect. File Vitals remains a
+separate product under its own Apache-2.0 license. Comparison of
+name, format, width, height, alpha, missing, and extra is ordinary
+combinator code in this draft and does not implement
+org.openadam.raster.verify.
+
+See THIRD_PARTY_NOTICES.txt for bundled File Vitals notices.

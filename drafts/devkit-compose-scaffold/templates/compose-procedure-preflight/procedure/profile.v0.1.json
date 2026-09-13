@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "openadam.procedure-profile.v0.5",
+  "id": __PROCEDURE_ID_JSON__,
+  "version": "0.1.0",
+  "title": "Preflight a caller-supplied slot set",
+  "summary": "Read a caller-supplied slot spec and a delivery directory, observe each present declared file with org.openadam.file.inspect@0.1.0 inspect (File Vitals), then compare in ordinary author code and aggregate missing/extra into ordered checks and a suite status. The adapter schedules one inspect per present path; there is no portable batch Capability. Comparison is ordinary code and does not implement raster.verify. Replace this summary with the product-specific method before removing the scaffold marker.",
+  "lifecycle": "experimental",
+  "semantics": {
+    "resultVariability": "deterministic",
+    "contextSources": ["referenced-resource"],
+    "stateAccess": "read",
+    "idempotency": "idempotent",
+    "openWorld": false
+  },
+  "inputSchema": {
+    "$ref": "./schemas/input.schema.json"
+  },
+  "outputSchema": {
+    "$ref": "./schemas/output.schema.json"
+  },
+  "stages": [
+    {
+      "kind": "capability",
+      "id": "inspect-files",
+      "title": "Inspect declared slot files",
+      "purpose": "The adapter internally schedules org.openadam.file.inspect inspect once per present declared slot path (JSONL sessions of at most 16; not a portable batch or inventory operation). Missing required paths skip inspect and become missing checks. Extra undeclared files are listed without inspect. Domain comparison is ordinary adapter code in src/compare.mjs and is not raster.verify.",
+      "required": true,
+      "dependsOn": [],
+      "capability": {
+        "id": "org.openadam.file.inspect",
+        "version": "0.1.0",
+        "operationId": "inspect"
+      }
+    }
+  ],
+  "completion": {
+    "description": "Completion is the aggregated preflight report: ordered checks plus suite status pass|fail. That report is combinator output after file.inspect observations, not a raw inspect envelope and not a raster.verify result.",
+    "outputStage": "inspect-files"
+  },
+  "errors": [
+    {
+      "code": "INVALID_INPUT",
+      "description": "The Procedure input is outside the portable contract or the slot spec cannot be parsed.",
+      "retryable": false
+    },
+    {
+      "code": "ROOT_NOT_FOUND",
+      "description": "The delivery root is missing or is not a directory inside the implementation grant.",
+      "retryable": false
+    },
+    {
+      "code": "PATH_FORBIDDEN",
+      "description": "A requested path is absolute, contains .., or escapes the implementation root.",
+      "retryable": false
+    },
+    {
+      "code": "LIMIT_EXCEEDED",
+      "description": "The slot set exceeds the declared Procedure bound of 32 slots.",
+      "retryable": false
+    },
+    {
+      "code": "PROVIDER_FAILED",
+      "description": "The File Vitals inspect adapter, the author compare implementation, or the Procedure adapter failed safely outside a more specific error.",
+      "retryable": true
+    }
+  ]
+}

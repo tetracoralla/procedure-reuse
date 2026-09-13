@@ -1,0 +1,12 @@
+== validate draft Profile / Manifest / Suite ==
+PASS capability-refs procedures=1 stages=1 capabilities=1
+PASS contract-set org.example.unfinished-compose.preflight@0.1.0 claim=result-boundary cases=1
+PASS stage-provider-bindings stages=1 providers=1
+PASS draft procedure org.example.unfinished-compose.preflight@0.1.0
+== result-boundary conformance ==
+(node:914938) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS empty-delivery-missing-slot
+PASS result-conformance implementation=org.example.unfinished-compose-preflight@0.1.0 procedure=org.example.unfinished-compose.preflight@0.1.0 cases=1
+== validate-stage-bindings (File Vitals) ==
+PASS stage-provider-bindings stages=1 providers=1

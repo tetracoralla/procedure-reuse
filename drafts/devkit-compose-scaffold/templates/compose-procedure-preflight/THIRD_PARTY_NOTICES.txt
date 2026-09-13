@@ -1,0 +1,8 @@
+SCAFFOLD_LEGAL_REVIEW_REQUIRED
+
+This component is intended to bundle the File Vitals capability-jsonl adapter
+(io.github.tetracoralla.file-vitals) so observation can run as
+org.openadam.file.inspect@0.1.0 inspect. Copy the File Vitals NOTICE and
+third-party licenses into this file before removing .openadam-scaffold.
+
+The MCP stdio carrier and combinator should not vendor npm packages.

@@ -1,0 +1,243 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "name": "good",
+      "spec": "specs/good.json",
+      "root": "fixtures/good",
+      "expect": "pass",
+      "status": "pass",
+      "exit": 0,
+      "failedIds": [],
+      "failedChecks": [],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "good-alt",
+      "spec": "specs/good.json",
+      "root": "fixtures/good-alt",
+      "expect": "pass",
+      "status": "pass",
+      "exit": 0,
+      "failedIds": [],
+      "failedChecks": [],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "wrong-size",
+      "spec": "specs/good.json",
+      "root": "fixtures/bad/wrong-size",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "width",
+        "height"
+      ],
+      "failedChecks": [
+        {
+          "id": "width",
+          "slot": "icon-64",
+          "path": "icon-64.png",
+          "expected": 64,
+          "observed": 48
+        },
+        {
+          "id": "height",
+          "slot": "icon-64",
+          "path": "icon-64.png",
+          "expected": 64,
+          "observed": 48
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "wrong-format",
+      "spec": "specs/good.json",
+      "root": "fixtures/bad/wrong-format",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "format"
+      ],
+      "failedChecks": [
+        {
+          "id": "format",
+          "slot": "wordmark",
+          "path": "wordmark.png",
+          "expected": "png",
+          "observed": "jpeg"
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "wrong-alpha",
+      "spec": "specs/good.json",
+      "root": "fixtures/bad/wrong-alpha",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "alpha"
+      ],
+      "failedChecks": [
+        {
+          "id": "alpha",
+          "slot": "wordmark",
+          "path": "wordmark.png",
+          "expected": "absent",
+          "observed": "present"
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "missing-slot",
+      "spec": "specs/good.json",
+      "root": "fixtures/bad/missing-slot",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "missing"
+      ],
+      "failedChecks": [
+        {
+          "id": "missing",
+          "slot": "icon-128",
+          "path": "icon-128.png",
+          "expected": "icon-128.png",
+          "observed": null
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "extra-file",
+      "spec": "specs/good.json",
+      "root": "fixtures/bad/extra-file",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "extra"
+      ],
+      "failedChecks": [
+        {
+          "id": "extra",
+          "slot": null,
+          "path": "scratch-icon.png",
+          "expected": null,
+          "observed": "scratch-icon.png"
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "wrong-name-as-missing-extra",
+      "spec": "specs/good.json",
+      "root": "fixtures/bad/wrong-name",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "missing",
+        "extra"
+      ],
+      "failedChecks": [
+        {
+          "id": "missing",
+          "slot": "icon-16",
+          "path": "icon-16.png",
+          "expected": "icon-16.png",
+          "observed": null
+        },
+        {
+          "id": "extra",
+          "slot": null,
+          "path": "icon16.png",
+          "expected": null,
+          "observed": "icon16.png"
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "wrong-name-located",
+      "spec": "specs/wrong-name.json",
+      "root": "fixtures/bad/wrong-name",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "name"
+      ],
+      "failedChecks": [
+        {
+          "id": "name",
+          "slot": "icon-16",
+          "path": "icon16.png",
+          "expected": "icon-16.png",
+          "observed": "icon16.png"
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "spec-height-edit",
+      "spec": "specs/good-wrong-height.json",
+      "root": "fixtures/good",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "height"
+      ],
+      "failedChecks": [
+        {
+          "id": "height",
+          "slot": "og-cover",
+          "path": "og-cover.png",
+          "expected": 361,
+          "observed": 360
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "name": "spec-name-edit",
+      "spec": "specs/name-mismatch.json",
+      "root": "fixtures/good",
+      "expect": "fail",
+      "status": "fail",
+      "exit": 1,
+      "failedIds": [
+        "name"
+      ],
+      "failedChecks": [
+        {
+          "id": "name",
+          "slot": "icon-16",
+          "path": "icon-16.png",
+          "expected": "app-icon-16.png",
+          "observed": "icon-16.png"
+        }
+      ],
+      "ok": true,
+      "stderr": ""
+    }
+  ]
+}

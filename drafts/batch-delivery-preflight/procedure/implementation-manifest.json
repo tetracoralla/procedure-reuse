@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "openadam.procedure-implementation-manifest.v0.5",
+  "provider": {
+    "id": "org.openadam.batch-delivery-preflight",
+    "name": "Batch delivery preflight",
+    "version": "0.1.0"
+  },
+  "implementations": [
+    {
+      "procedureId": "org.openadam.batch-delivery.preflight",
+      "procedureVersion": "0.1.0",
+      "profileDigest": "sha256:f4c88757bb3623cf5f836e385719ced8ccf0ad530525f52cf08c4d544579be18",
+      "adapter": {
+        "protocol": "openadam.procedure-jsonl.v0.2",
+        "command": "node",
+        "args": [
+          "procedure/adapter.mjs"
+        ]
+      },
+      "binding": {
+        "kind": "cli",
+        "target": "procedure/adapter.mjs"
+      },
+      "contractSchemaDigests": {
+        "input": "sha256:e7daf03da668ea1f74f97d68a02446fddb1dd508acd56fa7374544a8658773bc",
+        "output": "sha256:255e5b5d21e9f8ce8d258cfc0adf996a78ffa395c3ee4601c6fb36b6e13609db"
+      },
+      "stages": [
+        {
+          "stageId": "inspect-files",
+          "capabilityId": "org.openadam.file.inspect",
+          "capabilityVersion": "0.1.0",
+          "operationId": "inspect",
+          "provider": {
+            "id": "io.github.tetracoralla.file-vitals",
+            "name": "File Vitals",
+            "version": "0.3.3",
+            "homepage": "https://github.com/tetracoralla/file-vitals"
+          },
+          "transport": "capability-jsonl",
+          "target": "cmd/capability-adapter#inspect"
+        }
+      ]
+    }
+  ]
+}

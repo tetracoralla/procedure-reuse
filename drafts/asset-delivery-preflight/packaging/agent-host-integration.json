@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "openadam.agent-host-tool-integration.v0.2",
+  "displayName": "Asset delivery preflight",
+  "summary": "Read-only slot-set preflight using file.inspect observations and combinator comparison. Not raster.verify.",
+  "codex": {
+    "marketplaceRoot": "marketplace",
+    "marketplace": "private-asset-delivery-preflight",
+    "pluginRoot": "marketplace/plugins/asset-delivery-preflight",
+    "plugin": "asset-delivery-preflight",
+    "identityFiles": [
+      ".codex-plugin/plugin.json",
+      ".mcp.json",
+      "skills/asset-delivery-preflight/SKILL.md"
+    ]
+  },
+  "runtime": {
+    "transport": "mcp-stdio",
+    "executor": "suite-node",
+    "command": "marketplace/plugins/asset-delivery-preflight/runtime/mcp-server.mjs",
+    "args": [],
+    "cwd": "marketplace/plugins/asset-delivery-preflight",
+    "workspaceEnvironment": [
+      "OPENADAM_CAPABILITY_WORKSPACE_ROOT"
+    ],
+    "expectedTools": [
+      "asset_delivery_preflight"
+    ],
+    "timeoutMs": 30000
+  },
+  "ownership": {
+    "uninstall": "agent-host-created-only"
+  }
+}

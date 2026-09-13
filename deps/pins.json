@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "procedure-reuse.deps.v0.1",
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "22"
+  },
+  "fileVitals": {
+    "repo": "https://github.com/tetracoralla/file-vitals.git",
+    "commit": "53ed0ac412e1821bf068c87e4ff7aae899c49347",
+    "providerId": "io.github.tetracoralla.file-vitals",
+    "providerVersion": "0.3.3",
+    "go": "1.26.6",
+    "commands": ["./cmd/finspect", "./cmd/capability-adapter"]
+  },
+  "agentToolDevelopmentKit": {
+    "repo": "https://github.com/tetracoralla/agent-tool-development-kit.git",
+    "commit": "649cfd95457dfdc473d07026850b0f46485f0a9b",
+    "note": "Required for openadam-dev check/pack only. Compose scaffold init does not import Kit source."
+  },
+  "procedureContracts": {
+    "repo": "https://github.com/tetracoralla/procedure-contracts.git",
+    "commit": "ffac3689bc636c3a33dd61d6f2919f39cbbc6ceb",
+    "note": "Required for procedure/check.mjs and digest rewrite, not for node --test."
+  },
+  "capabilityContracts": {
+    "repo": "https://github.com/tetracoralla/capability-contracts.git",
+    "commit": "ef51ab875c7c6f99f6777bc066fe1929d5b136d0",
+    "note": "Required for procedure/check.mjs catalog refs, not for node --test."
+  }
+}

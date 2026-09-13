@@ -1,0 +1,54 @@
+{
+  "id": "kiosk-badge-marks",
+  "version": "0.1.0",
+  "title": "Kiosk badge marks",
+  "description": "24/48/96 badge plus opaque plate. Technical slot list only.",
+  "alphaPolicy": {
+    "present": "Pass only when File Vitals JSONL inspect reports image.has_alpha === true. Omitted has_alpha is observed as unknown and is not present.",
+    "absent": "Pass only when File Vitals JSONL inspect reports image.has_alpha === false. Omitted has_alpha is observed as unknown and is not absent.",
+    "any": "Do not fail the alpha check, including when has_alpha is omitted.",
+    "unknown": "Pass only when has_alpha is omitted. Do not invent present or absent."
+  },
+  "slots": [
+    {
+      "id": "badge-24",
+      "path": "badge-24.png",
+      "name": "badge-24.png",
+      "format": "png",
+      "width": 24,
+      "height": 24,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "badge-48",
+      "path": "badge-48.png",
+      "name": "badge-48.png",
+      "format": "png",
+      "width": 48,
+      "height": 48,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "badge-96",
+      "path": "badge-96.png",
+      "name": "badge-96.png",
+      "format": "png",
+      "width": 96,
+      "height": 96,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "plate",
+      "path": "plate.png",
+      "name": "plate.png",
+      "format": "png",
+      "width": 200,
+      "height": 80,
+      "alpha": "absent",
+      "required": true
+    }
+  ]
+}
