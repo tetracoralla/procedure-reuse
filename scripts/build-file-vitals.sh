@@ -89,20 +89,27 @@ else
   exit 2
 fi
 
-GO_VERSION="$("$GO_BIN" env GOVERSION)"
-case "$GO_VERSION" in
-  go1.26.*|go1.27.*|go1.[3-9]*|go[2-9]*) ;;
-  *)
-    echo "File Vitals go.mod requires Go $(pin_string fileVitals.go)+. Found $GO_VERSION ($GO_BIN)." >&2
-    echo "Install that toolchain from https://go.dev/dl/, or re-run with GOTOOLCHAIN=auto" >&2
-    echo "to let the official Go toolchain fetch go$(pin_string fileVitals.go) from go.dev." >&2
-    exit 2
-    ;;
-esac
-
 mkdir -p "$DEST"
 export GOTOOLCHAIN="${GOTOOLCHAIN:-local}"
 export CGO_ENABLED="${CGO_ENABLED:-0}"
+GO_VERSION="$(cd "$SRC" && "$GO_BIN" env GOVERSION)"
+GO_MINIMUM="go$(pin_string fileVitals.go)"
+if ! awk -v got="$GO_VERSION" -v need="$GO_MINIMUM" 'BEGIN {
+  sub(/^go/, "", got); sub(/^go/, "", need)
+  split(got, g, "."); split(need, n, ".")
+  for (i = 1; i <= 3; i++) {
+    gv = (g[i] == "" ? 0 : g[i]) + 0
+    nv = (n[i] == "" ? 0 : n[i]) + 0
+    if (gv > nv) exit 0
+    if (gv < nv) exit 1
+  }
+  exit 0
+}'; then
+  echo "File Vitals go.mod requires $GO_MINIMUM+. Found $GO_VERSION ($GO_BIN)." >&2
+  echo "Install that toolchain from https://go.dev/dl/, or re-run with GOTOOLCHAIN=auto" >&2
+  echo "to let the official Go toolchain fetch $GO_MINIMUM from go.dev." >&2
+  exit 2
+fi
 echo "building File Vitals from $SRC with $GO_BIN ($GO_VERSION)"
 # -trimpath keeps sealed pack from treating Go build paths as source-machine leaks.
 # Only the two known commands are built; no other scripts from the clone are run.

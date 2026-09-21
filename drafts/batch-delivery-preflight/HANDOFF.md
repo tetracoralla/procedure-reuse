@@ -5,7 +5,7 @@ M4 记录的是实施侧交接演练，不是独立第三方交接完成。
 
 Agent: default path is the CLI in「怎样第一次运行」. Do not assume MCP, Procedure JSONL, or Agent Host import. Read `handoff/AGENT.md` if you are an Agent.
 
-工作根：本仓库的 clone（Linux x64 + Node；干净环境见仓库 `docs/CLEAN_ENV.md`）。  
+工作根：本仓库的 clone（Linux 或 macOS + Node；干净环境见仓库 `docs/CLEAN_ENV.md`）。
 不要照抄历史路径 `/workspace/openadam-procedure-reuse/`——那是另一棵树，不是本 clone。  
 本项目：`drafts/batch-delivery-preflight/`
 
@@ -100,26 +100,25 @@ cd drafts/batch-delivery-preflight
 scripts/build-file-vitals.sh
 
 # 最短命令（作者自带的好夹具，用来确认工具能跑）
-node src/cli.mjs --spec specs/good.json --root fixtures/good --compact
+node src/cli.mjs --spec specs/good.json --root fixtures/good
 
 # 新任务 A：kiosk 徽标 + 海报（应 pass）
 node src/cli.mjs \
   --spec handoff/tasks/kiosk-badge/campaign.json \
-  --root handoff/tasks/kiosk-badge/delivery \
-  --compact
+  --root handoff/tasks/kiosk-badge/delivery
 
 # 新任务 B：文档站（第一次交货，宽图高度错，应 fail）
 node src/cli.mjs \
   --spec handoff/tasks/docs-social/campaign.json \
-  --root handoff/tasks/docs-social/delivery \
-  --compact
+  --root handoff/tasks/docs-social/delivery
 ```
 
 退出码：`0` = 整批 pass；`1` = 整批 fail（这是检查结果，不是程序崩了）；`2` = 用法/规格/适配器错误。
 
 不要从仓库根目录裸跑 `node src/cli.mjs`（相对路径对不上）。可以把 `--spec` / `--root` 写成绝对路径，但仍建议 `cd` 到本项目，这样能找到 `bin/capability-adapter` 和下层草稿。
 
-`--compact` 只是少空格；结果字段一样。
+默认只显示结论和失败项。需要完整结构化记录时加 `--json`；Agent
+或自动化要一行 JSON 时用 `--compact`。
 
 ---
 
@@ -168,7 +167,7 @@ node src/cli.mjs \
 | Kit `check` 报 Node 版本 | 契约工具要 Node ≥22 | CLI 预检本身不需要 Node 22 |
 | 想 `agent-host component import` | 本环境不做 | Linux 上 preview 已失败（GNU tar + 无 linux-x64 发行）。未授权不要 import |
 
-卡住仍无法判断时，把完整 JSON（或 `--compact` 那一行 `status` / `failedKits` / `failedIds`）交给人，不要改规格里没有的字段。
+卡住仍无法判断时，加 `--json` 后把完整结果交给人，不要改规格里没有的字段。
 
 ---
 

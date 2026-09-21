@@ -204,11 +204,11 @@ export async function runPreflight({ spec, root, adapter, workspaceRoot }) {
       kitSpec._path = null;
     } else {
       const specDir = spec._specDir ?? campaignCanonical;
-      const specFile = resolve(specDir, kit.specPath);
-      if (isOutside(specDir, specFile)) {
+      const specDirCanonical = await realpath(specDir);
+      const specFile = resolve(specDirCanonical, kit.specPath);
+      if (isOutside(specDirCanonical, specFile)) {
         throw new Error(`kit ${kit.id} specPath escapes the campaign spec directory: ${kit.specPath}`);
       }
-      const specDirCanonical = await realpath(specDir);
       const specCanonical = await realpathInsideGrant(
         specDirCanonical,
         specFile,

@@ -16,9 +16,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const PROJECT = join(HERE, "..");
 const CLI = join(HERE, "cli.mjs");
 
-function runCli(spec, root) {
+function runCli(spec, root, extraArgs = ["--compact"]) {
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(process.execPath, [CLI, "--spec", spec, "--root", root, "--compact"], {
+    const child = spawn(process.execPath, [CLI, "--spec", spec, "--root", root, ...extraArgs], {
       cwd: PROJECT,
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -40,6 +40,19 @@ function runCli(spec, root) {
     });
   });
 }
+
+whenAdapter("default CLI output is a short human result; JSON remains explicit", async () => {
+  const passed = await runCli("specs/good.json", "fixtures/good", []);
+  assert.equal(passed.code, 0);
+  assert.match(passed.stdout, /^PASS · 2\/2 kits · \d+ checks\n$/u);
+  assert.equal(passed.stdout.includes('"checks"'), false);
+
+  const failed = await runCli("specs/good.json", "fixtures/icons-wrong-size", []);
+  assert.equal(failed.code, 1);
+  assert.match(failed.stdout, /^FAIL · 1\/2 kits · 2 failed checks/mu);
+  assert.match(failed.stdout, /icons \/ icon-64: width · expected 64, got 48/u);
+  assert.match(failed.stdout, /icons \/ icon-64: height · expected 64, got 48/u);
+});
 
 function kitById(report, id) {
   return (report.kits ?? []).find((kit) => kit.id === id);
@@ -73,6 +86,20 @@ whenAdapter("good two-kit campaign passes", async () => {
     kitById(report, "covers").method.procedure,
     "org.openadam.channel-cover.preflight@0.1.0",
   );
+});
+
+whenAdapter("a symlink alias for the campaign tree is canonicalized before lower spec resolution", async () => {
+  if (process.platform === "win32") return;
+  const tmp = await mkdtemp(join(tmpdir(), "batch-alias-"));
+  const alias = join(tmp, "project-alias");
+  await symlink(PROJECT, alias, "dir");
+  const { code, report, stderr } = await runCli(
+    join(alias, "specs/good.json"),
+    join(alias, "fixtures/good"),
+  );
+  assert.equal(stderr, "");
+  assert.equal(code, 0);
+  assert.equal(report.status, "pass");
 });
 
 whenAdapter("missing required cover kit fails and names the kit", async () => {

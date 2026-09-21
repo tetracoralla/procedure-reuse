@@ -30,10 +30,15 @@ fallback from a broken packed module requires `OPENADAM_DRAFT_DEV_BINDINGS=1`.
 
 ```bash
 scripts/build-file-vitals.sh
-node src/cli.mjs --spec specs/good.json --root fixtures/good --compact
-node --test src/preflight.test.mjs src/mcp-server.test.mjs
+node src/cli.mjs --spec specs/good.json --root fixtures/good
+node src/cli.mjs --spec specs/good.json --root fixtures/good --json
+node --test src/preflight.test.mjs src/mcp-server.test.mjs src/procedure-adapter.test.mjs
 scripts/run-procedure-conformance.sh
 ```
+
+The default output is one human result plus localized failures. `--json`
+returns the complete structured report; `--compact` keeps one-line JSON for
+Agent and automation consumers.
 
 From the workspace, Node 22 on PATH:
 

@@ -27,7 +27,7 @@ Suite checks stay in ordinary code. This does **not** implement
 
 ## Clean environment
 
-From a clone of **this** repository on **Linux x64 + Node 22**, without
+From a clone of **this** repository on **Linux or macOS + Node 22**, without
 author `bin/`, `.tools/`, `repos/`, or leftover `dist/`:
 
 ```bash
@@ -43,10 +43,9 @@ sh scripts/build-file-vitals.sh --all-drafts
 sh scripts/verify-clean.sh --with-file-vitals
 ```
 
-CI workflow YAML: [`docs/ci.github.yml`](docs/ci.github.yml) (copy to
-`.github/workflows/ci.yml` with a token that has the `workflow` scope;
-see `docs/CLEAN_ENV.md`). Node tests required; File Vitals job builds the
-pinned Go adapter.
+CI runs from [`.github/workflows/ci.yml`](.github/workflows/ci.yml) on Linux
+and macOS. Node tests are required; File Vitals jobs build the pinned Go
+adapter and refuse skipped adapter-backed cases.
 
 After Skill or combinator source changes, rebuild the sealed pack before
 treating `dist/*.tar.gz` as evidence. Packs are gitignored and are not

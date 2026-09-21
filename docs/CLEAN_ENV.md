@@ -1,6 +1,6 @@
 # Clean environment
 
-Platform for the first-time path: **Linux x64 + Node 22**.
+Verified first-time platforms: **Linux x64 and macOS arm64 + Node 22**.
 
 This file is the entry that does **not** use an author `bin/`, `.tools/`,
 `repos/`, leftover `dist/`, or a previous session. Start from a git commit of
@@ -92,20 +92,8 @@ Env: `OPENADAM_DEVKIT_ROOT`, `PROCEDURE_CONTRACTS_SRC`, `CAPABILITY_CONTRACTS_SR
 
 ## CI
 
-The workflow YAML is [`docs/ci.github.yml`](ci.github.yml) (Linux x64 + Node 22).
-GitHub rejects creating `.github/workflows/*.yml` from an OAuth token that
-lacks the `workflow` scope. With that scope (or from the Actions UI):
-
-```bash
-mkdir -p .github/workflows
-cp docs/ci.github.yml .github/workflows/ci.yml
-git add .github/workflows/ci.yml
-git commit -m "Install GitHub Actions workflow."
-git push origin review/asset-delivery-methods
-```
-
-Until then, the local equivalent is the commands below. When the workflow
-file is on the default-allowed path it runs on push and pull_request:
+The active workflow is [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
+It runs on Linux and macOS for pushes, pull requests, and manual dispatch:
 
 - `node-tests` — `scripts/verify-clean.sh --node-only` on Node 22
 - `file-vitals` — setup-go 1.26.6, fetch the pin, build, then

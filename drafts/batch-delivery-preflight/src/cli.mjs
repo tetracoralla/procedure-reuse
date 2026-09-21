@@ -13,15 +13,16 @@ function usage(message) {
   if (message) {
     process.stderr.write(`${message}\n`);
   }
-  process.stderr.write(`Usage: node src/cli.mjs --spec <campaign.json> --root <campaign-dir> [--adapter <capability-adapter>] [--workspace-root <dir>] [--compact]
+  process.stderr.write(`Usage: node src/cli.mjs --spec <campaign.json> --root <campaign-dir> [--adapter <capability-adapter>] [--workspace-root <dir>] [--json | --compact]
 
 Two-layer combinator: dispatches each kit to asset-delivery-preflight or channel-cover-preflight.
 Observation: org.openadam.file.inspect@0.1.0 per kit root. Not raster.verify. Not Direct Runtime.
+Default output is a short human result. Use --json for the complete report or --compact for one-line JSON.
 `);
 }
 
 function parseArgs(argv) {
-  const out = { spec: null, root: null, adapter: null, workspaceRoot: null, pretty: true };
+  const out = { spec: null, root: null, adapter: null, workspaceRoot: null, output: "human" };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     const next = () => {
@@ -45,10 +46,11 @@ function parseArgs(argv) {
         out.workspaceRoot = next();
         break;
       case "--compact":
-        out.pretty = false;
+        out.output = "compact-json";
         break;
+      case "--json":
       case "--pretty":
-        out.pretty = true;
+        out.output = "pretty-json";
         break;
       case "--help":
       case "-h":
@@ -59,6 +61,29 @@ function parseArgs(argv) {
     }
   }
   return out;
+}
+
+function shown(value) {
+  if (value === null || value === undefined) return "missing";
+  if (typeof value === "string") return value;
+  return JSON.stringify(value);
+}
+
+export function formatHumanSummary(report, { limit = 8 } = {}) {
+  const summary = report?.summary ?? {};
+  if (report?.status === "pass") {
+    return `PASS · ${summary.present ?? 0}/${summary.kits ?? 0} kits · ${summary.checks ?? 0} checks`;
+  }
+  const failed = (report?.checks ?? []).filter((check) => check?.passed === false);
+  const lines = [
+    `FAIL · ${(summary.failedKits ?? []).length}/${summary.kits ?? 0} kits · ${summary.failed ?? failed.length} failed checks`,
+  ];
+  for (const check of failed.slice(0, limit)) {
+    const target = [check.kit, check.slot ?? check.path].filter(Boolean).join(" / ") || "delivery";
+    lines.push(`- ${target}: ${check.id} · expected ${shown(check.expected)}, got ${shown(check.observed)}`);
+  }
+  if (failed.length > limit) lines.push(`- ${failed.length - limit} more · use --json for full details`);
+  return lines.join("\n");
 }
 
 async function optionalAdapter(explicit) {
@@ -99,7 +124,11 @@ export async function main(argv) {
     await realpath(workspaceRoot);
     const adapter = await optionalAdapter(args.adapter);
     const report = await runPreflight({ spec, root, adapter, workspaceRoot });
-    process.stdout.write(`${JSON.stringify(report, null, args.pretty ? 2 : 0)}\n`);
+    if (args.output === "human") {
+      process.stdout.write(`${formatHumanSummary(report)}\n`);
+    } else {
+      process.stdout.write(`${JSON.stringify(report, null, args.output === "pretty-json" ? 2 : 0)}\n`);
+    }
     return report.status === "pass" ? 0 : 1;
   } catch (error) {
     process.stderr.write(`${error.message}\n`);

@@ -106,6 +106,7 @@ echo "== batch-delivery-preflight =="
 "$NODE_BIN" --test \
   drafts/batch-delivery-preflight/src/preflight.test.mjs \
   drafts/batch-delivery-preflight/src/mcp-server.test.mjs \
+  drafts/batch-delivery-preflight/src/procedure-adapter.test.mjs \
   drafts/batch-delivery-preflight/src/lower.test.mjs
 
 echo "== compose-scaffold init (no Kit checkout) =="
