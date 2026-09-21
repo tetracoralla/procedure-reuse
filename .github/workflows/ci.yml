@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-tests:
+    name: node-tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Minimum checks (no File Vitals binary)
+        run: sh scripts/verify-clean.sh --node-only
+
+  file-vitals:
+    name: file-vitals (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.6"
+      - name: Fetch pinned File Vitals
+        run: sh scripts/fetch-deps.sh --file-vitals
+      - name: Build File Vitals adapter
+        env:
+          GOTOOLCHAIN: local
+          CGO_ENABLED: "0"
+        run: sh scripts/build-file-vitals.sh --all-drafts
+      - name: Adapter-backed tests
+        env:
+          REQUIRE_FILE_VITALS: "1"
+        run: sh scripts/verify-clean.sh --with-file-vitals

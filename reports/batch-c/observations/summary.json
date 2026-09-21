@@ -1,0 +1,99 @@
+{
+  "marker": "synthetic-authorized-substitute",
+  "task": "northline-transit-v1",
+  "workDir": "/tmp/batch-c-northline",
+  "node": "v20.19.2 /usr/bin/node",
+  "adapter": "drafts/batch-delivery-preflight/bin/capability-adapter rebuilt 2026-09-13 via scripts/build-file-vitals.sh",
+  "fileVitals": "https://github.com/tetracoralla/file-vitals.git @ 53ed0ac412e1821bf068c87e4ff7aae899c49347",
+  "go": "system go1.24.4 + GOTOOLCHAIN=go1.26.6 (official go.dev toolchain; not author .tools/go)",
+  "uniqueness": {
+    "newImageFiles": 23,
+    "oldRepoImageFilesHashed": 120,
+    "sha256Overlap": 0
+  },
+  "runs": [
+    {
+      "id": "usage-fail",
+      "spec": "campaign.json",
+      "root": "delivery",
+      "cliExit": 1,
+      "status": "fail",
+      "failedKits": ["station-boards"],
+      "failedIds": ["height", "aspect"],
+      "checks": 59,
+      "naiveStatus": "fail",
+      "naiveFailedIds": ["aspect", "height"]
+    },
+    {
+      "id": "usage-pass",
+      "spec": "campaign.json",
+      "root": "delivery-fixed",
+      "cliExit": 0,
+      "status": "pass",
+      "failedKits": [],
+      "failedIds": [],
+      "checks": 59,
+      "naiveStatus": "pass"
+    },
+    {
+      "id": "authoring-missing",
+      "spec": "campaign-v2.json",
+      "root": "delivery-fixed",
+      "cliExit": 1,
+      "status": "fail",
+      "failedKits": ["app-tiles"],
+      "failedIds": ["missing"],
+      "checks": 60,
+      "naiveStatus": "fail"
+    },
+    {
+      "id": "authoring-pass",
+      "spec": "campaign-v2.json",
+      "root": "delivery-v2",
+      "cliExit": 0,
+      "status": "pass",
+      "failedKits": [],
+      "failedIds": [],
+      "checks": 67,
+      "naiveStatus": "pass"
+    },
+    {
+      "id": "generate-v1",
+      "spec": "kits/app-tiles.json",
+      "written": ["tile-20.png", "tile-40.png", "tile-80.png", "lockup.png"],
+      "status": "pass",
+      "stage": "generate"
+    },
+    {
+      "id": "generate-v2",
+      "spec": "kits/app-tiles-v2.json",
+      "written": ["tile-20.png", "tile-40.png", "tile-80.png", "tile-120.png", "lockup.png"],
+      "status": "pass",
+      "stage": "generate"
+    },
+    {
+      "id": "assembled-generated-v2",
+      "spec": "campaign-v2.json",
+      "root": "assembled-v2 (generate v2 tiles + station-boards)",
+      "cliExit": 0,
+      "status": "pass",
+      "checks": 67
+    },
+    {
+      "id": "usage-extra",
+      "note": "README.md dropped into app-tiles kit root",
+      "cliExit": 1,
+      "status": "fail",
+      "failedKits": ["app-tiles"],
+      "failedIds": ["extra"]
+    }
+  ],
+  "friction": {
+    "humanFollowUps": 0,
+    "pathChanges": 2,
+    "passFailMisread": 0,
+    "reworkFiles": 1,
+    "cwdTrap": "node src/cli.mjs from repo root → MODULE_NOT_FOUND",
+    "staleHandoffRoot": "/workspace/openadam-procedure-reuse/ exists as a different tree; this clone was used instead"
+  }
+}

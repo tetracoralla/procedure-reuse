@@ -1,0 +1,23 @@
+{
+  "id": "northline-transit-v1",
+  "version": "0.1.0",
+  "family": "batch-delivery",
+  "title": "Northline Transit rider-app v1 store listing",
+  "description": "App tiles plus station-board covers. Technical kit list only. Not a visual, brand, copy, or generation review. synthetic-authorized-substitute.",
+  "kits": [
+    {
+      "id": "app-tiles",
+      "kind": "asset-delivery",
+      "required": true,
+      "root": "app-tiles",
+      "specPath": "kits/app-tiles.json"
+    },
+    {
+      "id": "station-boards",
+      "kind": "channel-cover",
+      "required": true,
+      "root": "station-boards",
+      "specPath": "kits/station-boards.json"
+    }
+  ]
+}

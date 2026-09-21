@@ -1,0 +1,23 @@
+{
+  "id": "kiosk-badge-2026",
+  "version": "0.1.0",
+  "family": "batch-delivery",
+  "title": "Kiosk badge and poster delivery",
+  "description": "Store-kiosk mark plus three posters. Technical kit list only. Not a visual, brand, copy, or generation review.",
+  "kits": [
+    {
+      "id": "badge",
+      "kind": "asset-delivery",
+      "required": true,
+      "root": "badge",
+      "specPath": "kits/badge.json"
+    },
+    {
+      "id": "posters",
+      "kind": "channel-cover",
+      "required": true,
+      "root": "posters",
+      "specPath": "kits/posters.json"
+    }
+  ]
+}

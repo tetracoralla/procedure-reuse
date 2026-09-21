@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "openadam.procedure-implementation-manifest.v0.5",
+  "provider": {
+    "id": "org.openadam.channel-cover-preflight",
+    "name": "Channel cover preflight",
+    "version": "0.1.0"
+  },
+  "implementations": [
+    {
+      "procedureId": "org.openadam.channel-cover.preflight",
+      "procedureVersion": "0.1.0",
+      "profileDigest": "sha256:98e8f27701a85587ab787b8c7fee40e8107344dc323b5e4e9ee4667352fd0c90",
+      "adapter": {
+        "protocol": "openadam.procedure-jsonl.v0.2",
+        "command": "node",
+        "args": [
+          "procedure/adapter.mjs"
+        ]
+      },
+      "binding": {
+        "kind": "cli",
+        "target": "procedure/adapter.mjs"
+      },
+      "contractSchemaDigests": {
+        "input": "sha256:ed2feb034bc319213310bf0c4e3e27a18a307f8efea43093d9ec02ee1dc5e3ad",
+        "output": "sha256:6986bc2545ae54b510cc92ce34ce72a5215612cffd5034f40ca5d2be77cae5fc"
+      },
+      "stages": [
+        {
+          "stageId": "inspect-files",
+          "capabilityId": "org.openadam.file.inspect",
+          "capabilityVersion": "0.1.0",
+          "operationId": "inspect",
+          "provider": {
+            "id": "io.github.tetracoralla.file-vitals",
+            "name": "File Vitals",
+            "version": "0.3.3",
+            "homepage": "https://github.com/tetracoralla/file-vitals"
+          },
+          "transport": "capability-jsonl",
+          "target": "cmd/capability-adapter#inspect"
+        }
+      ]
+    }
+  ]
+}

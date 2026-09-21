@@ -1,0 +1,21 @@
+{
+  "name": "batch-delivery-preflight",
+  "version": "0.1.0",
+  "description": "Read-only two-layer preflight: dispatch each campaign kit to asset-delivery-preflight or channel-cover-preflight. Observation is file.inspect. Does not implement raster.verify.",
+  "author": {
+    "name": "openAdam"
+  },
+  "license": "Apache-2.0",
+  "keywords": ["agent-tool", "mcp", "preflight", "procedure"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Batch delivery preflight",
+    "shortDescription": "Read-only two-layer campaign preflight over existing icon and cover combinators.",
+    "longDescription": "Read-only two-layer preflight: dispatch each campaign kit to asset-delivery-preflight or channel-cover-preflight. Observation is file.inspect. Does not implement raster.verify.",
+    "developerName": "openAdam",
+    "category": "Developer Tools",
+    "capabilities": ["Read"],
+    "defaultPrompt": ["Read-only two-layer campaign preflight. Dispatch kits to existing combinators. Observation is file.inspect, not raster.verify."]
+  }
+}

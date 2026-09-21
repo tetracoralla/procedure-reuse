@@ -1,0 +1,1 @@
+SCAFFOLD_INCOMPLETE: implement src/spec.mjs, src/compare.mjs, fixtures, procedure cases, Skill, and legal files, then remove .openadam-scaffold.

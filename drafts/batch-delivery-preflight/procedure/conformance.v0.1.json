@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "openadam.procedure-conformance-suite.v0.4",
+  "procedureId": "org.openadam.batch-delivery.preflight",
+  "procedureVersion": "0.1.0",
+  "claimLevel": "result-boundary",
+  "cases": [
+    {
+      "id": "good-campaign-pass",
+      "description": "A two-kit campaign (good icon suite + good channel-cover suite) reports suite status pass. Observation is file.inspect via the lower combinators.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/good",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "pass",
+          "summary": {
+            "failed": 0,
+            "failedKits": [],
+            "failedIds": []
+          },
+          "observer": {
+            "capability": "org.openadam.file.inspect@0.1.0",
+            "operation": "inspect",
+            "provider": "io.github.tetracoralla.file-vitals",
+            "transport": "openadam.capability-jsonl.v0.1"
+          }
+        }
+      }
+    },
+    {
+      "id": "missing-cover-kit-fail",
+      "description": "The same campaign spec against a directory missing the required covers kit completes successfully with suite status fail, failedKits covers, and kitMissing.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/missing-covers",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedKits": ["covers"],
+            "failedIds": ["kitMissing"]
+          }
+        }
+      }
+    },
+    {
+      "id": "icons-wrong-size-fail",
+      "description": "A campaign whose icon kit has icon-64 at 48x48 instead of 64x64 fails and localizes width/height to kit icons slot icon-64. The cover kit still passes.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/icons-wrong-size",
+        "specPath": "specs/good.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedKits": ["icons"]
+          }
+        }
+      }
+    },
+    {
+      "id": "campaign-list-change-pass",
+      "description": "The same icons-wrong-size files with the icons kit dropped from the campaign list flip fail to pass. Changing the upper list changes execution.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/icons-wrong-size",
+        "specPath": "specs/covers-only.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "pass",
+          "summary": {
+            "failed": 0,
+            "failedKits": [],
+            "kits": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "lower-spec-height-change-fail",
+      "description": "The same good files with only the icon kit og-cover expected height changed from 360 to 361 flip pass to fail. Changing the lower spec changes the batch result.",
+      "timeoutMs": 30000,
+      "input": {
+        "root": "fixtures/good",
+        "specPath": "specs/icons-wrong-height.json"
+      },
+      "expect": {
+        "result": "success",
+        "match": "subset",
+        "value": {
+          "status": "fail",
+          "summary": {
+            "failedKits": ["icons"],
+            "failedIds": ["height"]
+          }
+        }
+      }
+    }
+  ]
+}

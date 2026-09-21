@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "openadam.agent-host-tool-integration.v0.2",
+  "displayName": "Channel cover preflight",
+  "summary": "Read-only preflight for channel-cover slots using file.inspect observations and combinator co...",
+  "codex": {
+    "marketplaceRoot": "marketplace",
+    "marketplace": "private-channel-cover-preflight",
+    "pluginRoot": "marketplace/plugins/channel-cover-preflight",
+    "plugin": "channel-cover-preflight",
+    "identityFiles": [
+      ".codex-plugin/plugin.json",
+      ".mcp.json",
+      "skills/channel-cover-preflight/SKILL.md"
+    ]
+  },
+  "runtime": {
+    "transport": "mcp-stdio",
+    "executor": "suite-node",
+    "command": "marketplace/plugins/channel-cover-preflight/runtime/mcp-server.mjs",
+    "args": [],
+    "cwd": "marketplace/plugins/channel-cover-preflight",
+    "workspaceEnvironment": [
+      "OPENADAM_CAPABILITY_WORKSPACE_ROOT"
+    ],
+    "expectedTools": [
+      "channel_cover_preflight"
+    ],
+    "timeoutMs": 30000
+  },
+  "ownership": {
+    "uninstall": "agent-host-created-only"
+  }
+}

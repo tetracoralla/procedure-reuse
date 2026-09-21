@@ -1,0 +1,74 @@
+{
+  "id": "obs-icon-16",
+  "ok": true,
+  "result": {
+    "status": "ok",
+    "file": {
+      "name": "icon-16.png",
+      "size_bytes": 86,
+      "extension": ".png",
+      "modified_utc": "2026-09-11T17:27:58.109892751Z"
+    },
+    "identity": {
+      "kind": "image",
+      "media_type": "image/png",
+      "format": "PNG",
+      "confidence": "exact",
+      "extension_match": true,
+      "candidates": [
+        {
+          "source": "signature",
+          "media_type": "image/png",
+          "format": "PNG",
+          "confidence": "exact"
+        },
+        {
+          "source": "extension",
+          "media_type": "image/png",
+          "format": "PNG",
+          "confidence": "probable"
+        }
+      ],
+      "conflicts": []
+    },
+    "traits": [
+      "metadata_readable",
+      "previewable",
+      "transcodable"
+    ],
+    "integrity": {
+      "readable": true,
+      "parseable": true
+    },
+    "image": {
+      "width": 16,
+      "height": 16,
+      "bit_depth": 8,
+      "color_model": "nrgba",
+      "has_alpha": true
+    },
+    "diagnostics": [],
+    "provenance": [
+      {
+        "probe": "internal-signatures",
+        "version": "0.3.3",
+        "status": "used"
+      },
+      {
+        "probe": "file",
+        "status": "unavailable"
+      },
+      {
+        "probe": "image",
+        "version": "0.3.3",
+        "status": "used"
+      }
+    ],
+    "limits": {
+      "mode": "standard",
+      "response_bytes_max": 262144,
+      "timeout_ms": 10000,
+      "memory_bytes_max": 402653184
+    }
+  }
+}

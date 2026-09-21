@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openadam:procedure:batch-delivery.preflight:v0.1:output",
+  "title": "Batch delivery preflight output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "spec", "root", "workspaceRoot", "observer", "methods", "kits", "checks", "summary"],
+  "properties": {
+    "status": { "enum": ["pass", "fail"] },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "path"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "version": { "type": ["string", "null"] },
+        "path": { "type": ["string", "null"] }
+      }
+    },
+    "root": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "workspaceRoot": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "observer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "operation", "provider", "transport", "adapter", "note"],
+      "properties": {
+        "capability": { "const": "org.openadam.file.inspect@0.1.0" },
+        "operation": { "const": "inspect" },
+        "provider": { "const": "io.github.tetracoralla.file-vitals" },
+        "transport": { "const": "openadam.capability-jsonl.v0.1" },
+        "adapter": { "type": ["string", "null"], "minLength": 1, "maxLength": 4096 },
+        "note": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "methods": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/method" }
+    },
+    "kits": {
+      "type": "array",
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/kitResult" }
+    },
+    "checks": {
+      "type": "array",
+      "maxItems": 512,
+      "items": { "$ref": "#/$defs/check" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kits", "present", "missing", "failedKits", "checks", "passed", "failed", "failedIds"],
+      "properties": {
+        "kits": { "type": "integer", "minimum": 0 },
+        "present": { "type": "integer", "minimum": 0 },
+        "missing": { "type": "integer", "minimum": 0 },
+        "failedKits": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "type": "string", "minLength": 1, "maxLength": 160 }
+        },
+        "checks": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "failedIds": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/checkId" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "checkId": {
+      "enum": ["kitMissing", "name", "format", "width", "height", "alpha", "missing", "extra", "namePattern", "aspect", "transparency", "inspectStatus", "inspectIntegrity", "inspectDiagnostic"]
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kit", "kind", "implementation", "procedure"],
+      "properties": {
+        "kit": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "kind": { "enum": ["asset-delivery", "channel-cover"] },
+        "implementation": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "procedure": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "resolvedPath": { "type": ["string", "null"], "minLength": 1, "maxLength": 4096 },
+        "bindingMode": { "type": ["string", "null"], "enum": ["packed", "sibling-draft", "dev-fallback", null] }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kit", "passed", "expected", "observed"],
+      "properties": {
+        "id": { "$ref": "#/$defs/checkId" },
+        "kit": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "passed": { "type": "boolean" },
+        "expected": { "type": ["string", "integer", "boolean", "null"] },
+        "observed": { "type": ["string", "integer", "boolean", "null"] },
+        "slot": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "error": { "type": ["object", "null"] }
+      }
+    },
+    "kitResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "required", "present", "status", "root", "workspaceRoot", "method", "spec", "summary", "failed", "lower"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "kind": { "enum": ["asset-delivery", "channel-cover"] },
+        "required": { "type": "boolean" },
+        "present": { "type": "boolean" },
+        "status": { "enum": ["pass", "fail", "skip"] },
+        "root": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "workspaceRoot": { "type": ["string", "null"], "minLength": 1, "maxLength": 4096 },
+        "method": { "$ref": "#/$defs/method" },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "path"],
+          "properties": {
+            "id": { "type": ["string", "null"] },
+            "version": { "type": ["string", "null"] },
+            "path": { "type": ["string", "null"] }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["slots", "files", "checks", "passed", "failed", "failedIds"],
+          "properties": {
+            "slots": { "type": "integer", "minimum": 0 },
+            "files": { "type": "integer", "minimum": 0 },
+            "checks": { "type": "integer", "minimum": 0 },
+            "passed": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 },
+            "failedIds": {
+              "type": "array",
+              "maxItems": 16,
+              "items": { "type": "string", "minLength": 1, "maxLength": 160 }
+            }
+          }
+        },
+        "failed": {
+          "type": "array",
+          "maxItems": 512,
+          "items": { "$ref": "#/$defs/check" }
+        },
+        "lower": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["status", "observer", "summary"],
+          "properties": {
+            "status": { "enum": ["pass", "fail"] },
+            "observer": { "type": "object" },
+            "summary": { "type": "object" }
+          }
+        }
+      }
+    }
+  }
+}

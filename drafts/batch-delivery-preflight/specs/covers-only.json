@@ -1,0 +1,16 @@
+{
+  "id": "campaign-covers-only",
+  "version": "0.1.0",
+  "family": "batch-delivery",
+  "title": "Cover kit only",
+  "description": "Same campaign root as the two-kit list, but the icons kit is dropped. Used to prove a campaign-list edit changes the batch result on the same files.",
+  "kits": [
+    {
+      "id": "covers",
+      "kind": "channel-cover",
+      "required": true,
+      "root": "covers",
+      "specPath": "kits/channel-cover.good.json"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "id": "northline-app-tiles",
+  "version": "0.2.0",
+  "title": "Northline Transit app tiles (tablet tile added)",
+  "description": "20/40/80/120 home-screen tiles plus opaque 180x36 lockup. Technical slot list only. synthetic-authorized-substitute. v2 adds tile-120 after a store-listing policy addendum.",
+  "alphaPolicy": {
+    "present": "Pass only when File Vitals JSONL inspect reports image.has_alpha === true. Omitted has_alpha is observed as unknown and is not present.",
+    "absent": "Pass only when File Vitals JSONL inspect reports image.has_alpha === false. Omitted has_alpha is observed as unknown and is not absent.",
+    "any": "Do not fail the alpha check, including when has_alpha is omitted.",
+    "unknown": "Pass only when has_alpha is omitted. Do not invent present or absent."
+  },
+  "slots": [
+    {
+      "id": "tile-20",
+      "path": "tile-20.png",
+      "name": "tile-20.png",
+      "format": "png",
+      "width": 20,
+      "height": 20,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "tile-40",
+      "path": "tile-40.png",
+      "name": "tile-40.png",
+      "format": "png",
+      "width": 40,
+      "height": 40,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "tile-80",
+      "path": "tile-80.png",
+      "name": "tile-80.png",
+      "format": "png",
+      "width": 80,
+      "height": 80,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "tile-120",
+      "path": "tile-120.png",
+      "name": "tile-120.png",
+      "format": "png",
+      "width": 120,
+      "height": 120,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "lockup",
+      "path": "lockup.png",
+      "name": "lockup.png",
+      "format": "png",
+      "width": 180,
+      "height": 36,
+      "alpha": "absent",
+      "required": true
+    }
+  ]
+}

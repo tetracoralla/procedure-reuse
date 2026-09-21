@@ -1,0 +1,13 @@
+{
+  "id": "scaffold-example",
+  "version": "0.1.0",
+  "title": "Scaffold example spec",
+  "description": "Replace with the product slot list. Technical fields only.",
+  "slots": [
+    {
+      "id": "slot-a",
+      "path": "slot-a.png",
+      "required": true
+    }
+  ]
+}

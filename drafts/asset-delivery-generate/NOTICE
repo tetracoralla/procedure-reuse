@@ -1,0 +1,19 @@
+Asset delivery generate 0.1.0
+Copyright 2026 openAdam
+
+This product includes software developed by openAdam.
+
+Generation cover-crops and downscales with a premultiplied-alpha area box
+filter. PNG decode/encode uses vendored pngjs 7.0.0 (MIT,
+https://github.com/lukeapage/pngjs); see third_party/pngjs/LICENSE.
+It does not implement org.openadam.raster.prepare, does not implement
+org.openadam.brand-asset.prepare, and does not bind the unpublished
+asset-prep provider. Supported files remain non-interlaced 8-bit RGB/RGBA
+PNG only.
+
+After writing a new output directory, this draft calls the existing
+asset-delivery-preflight 0.1.0 combinator by ordinary function import.
+Slot comparison stays in that module. Observation uses the File Vitals
+capability-jsonl adapter (io.github.tetracoralla.file-vitals 0.3.3) to
+implement org.openadam.file.inspect@0.1.0 inspect. File Vitals remains a
+separate product under its own Apache-2.0 license.

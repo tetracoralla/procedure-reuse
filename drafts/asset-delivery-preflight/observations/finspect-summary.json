@@ -1,0 +1,125 @@
+{
+  "good-icon-16": {
+    "status": "ok",
+    "file": {
+      "name": "icon-16.png",
+      "size_bytes": 86,
+      "extension": ".png"
+    },
+    "identity": {
+      "format": "PNG",
+      "media_type": "image/png",
+      "confidence": "exact",
+      "extension_match": true,
+      "conflicts": []
+    },
+    "image": {
+      "width": 16,
+      "height": 16,
+      "color_model": "nrgba",
+      "has_alpha": true
+    }
+  },
+  "good-wordmark-opaque": {
+    "status": "ok",
+    "file": {
+      "name": "wordmark.png",
+      "size_bytes": 215,
+      "extension": ".png"
+    },
+    "identity": {
+      "format": "PNG",
+      "media_type": "image/png",
+      "confidence": "exact",
+      "extension_match": true,
+      "conflicts": []
+    },
+    "image": {
+      "width": 320,
+      "height": 64,
+      "color_model": "rgba",
+      "has_alpha": false
+    }
+  },
+  "bad-wrong-size-icon-64": {
+    "status": "ok",
+    "file": {
+      "name": "icon-64.png",
+      "size_bytes": 130,
+      "extension": ".png"
+    },
+    "identity": {
+      "format": "PNG",
+      "media_type": "image/png",
+      "confidence": "exact",
+      "extension_match": true,
+      "conflicts": []
+    },
+    "image": {
+      "width": 48,
+      "height": 48,
+      "color_model": "nrgba",
+      "has_alpha": true
+    }
+  },
+  "bad-wrong-format-wordmark": {
+    "status": "ok",
+    "file": {
+      "name": "wordmark.png",
+      "size_bytes": 442,
+      "extension": ".png"
+    },
+    "identity": {
+      "format": "JPEG",
+      "media_type": "image/jpeg",
+      "confidence": "exact",
+      "extension_match": false,
+      "conflicts": [
+        "Extension suggests image/png but signature indicates image/jpeg."
+      ]
+    },
+    "image": {
+      "width": 320,
+      "height": 64,
+      "color_model": "ycbcr",
+      "has_alpha": false
+    }
+  },
+  "sample-vp8l-unknown-alpha": {
+    "status": "ok",
+    "file": {
+      "name": "vp8l-unknown-alpha.webp",
+      "size_bytes": 36,
+      "extension": ".webp"
+    },
+    "identity": {
+      "format": "WebP",
+      "media_type": "image/webp",
+      "confidence": "exact",
+      "extension_match": true,
+      "conflicts": []
+    },
+    "image": {
+      "width": 1,
+      "height": 1,
+      "color_model": "rgba",
+      "has_alpha_omitted": true
+    }
+  },
+  "sample-ico-no-identity": {
+    "status": "unsupported",
+    "file": {
+      "name": "icon.ico",
+      "size_bytes": 108,
+      "extension": ".ico"
+    },
+    "identity": {
+      "format": "Unknown",
+      "media_type": "application/octet-stream",
+      "confidence": "unknown",
+      "extension_match": null,
+      "conflicts": []
+    },
+    "image": null
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "docs-favicons",
+  "version": "0.1.0",
+  "title": "Docs site favicons",
+  "description": "32 and 64 PNG favicons with alpha. Technical slot list only.",
+  "alphaPolicy": {
+    "present": "Pass only when File Vitals JSONL inspect reports image.has_alpha === true. Omitted has_alpha is observed as unknown and is not present.",
+    "absent": "Pass only when File Vitals JSONL inspect reports image.has_alpha === false. Omitted has_alpha is observed as unknown and is not absent.",
+    "any": "Do not fail the alpha check, including when has_alpha is omitted.",
+    "unknown": "Pass only when has_alpha is omitted. Do not invent present or absent."
+  },
+  "slots": [
+    {
+      "id": "favicon-32",
+      "path": "favicon-32.png",
+      "name": "favicon-32.png",
+      "format": "png",
+      "width": 32,
+      "height": 32,
+      "alpha": "present",
+      "required": true
+    },
+    {
+      "id": "favicon-64",
+      "path": "favicon-64.png",
+      "name": "favicon-64.png",
+      "format": "png",
+      "width": 64,
+      "height": 64,
+      "alpha": "present",
+      "required": true
+    }
+  ]
+}

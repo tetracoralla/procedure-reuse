@@ -1,0 +1,21 @@
+{
+  "id": "docs-social",
+  "title": "Docs favicon + social cards",
+  "whyDifferent": "New names (favicon-32/64, card-square/wide/tall), new sizes (32/64 and 72/176x99/99x176), optional 4:5 slot left absent, different kit ids. First tree has a 176x100 JPEG on purpose.",
+  "spec": "campaign.json",
+  "root": "delivery",
+  "expect": {
+    "status": "fail",
+    "failedKits": ["social"],
+    "failedIds": ["height", "aspect"]
+  },
+  "fix": {
+    "root": "delivery-fixed",
+    "note": "Replace card-wide.jpg 176x100 with 176x99 (16:9). Favicons unchanged. Optional card-portrait still absent.",
+    "expect": {
+      "status": "pass",
+      "failedKits": [],
+      "failedIds": []
+    }
+  }
+}

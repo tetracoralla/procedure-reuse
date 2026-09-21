@@ -1,0 +1,282 @@
+{
+  "generatedAt": "2026-09-12T16:24:47.983Z",
+  "followed": "HANDOFF.md shortest commands from drafts/batch-delivery-preflight",
+  "hostImport": false,
+  "environment": {
+    "execPath": "/usr/bin/node",
+    "execVersion": "v20.19.2",
+    "whichNode": "/usr/bin/node\nv20.19.2",
+    "systemNode": "/usr/bin/node\nv20.19.2",
+    "adapterPresent": true,
+    "adapterPath": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/bin/capability-adapter"
+  },
+  "uniqueness": {
+    "newPixelCount": 17,
+    "overlapWithAuthorGood": []
+  },
+  "inspectGrants": [
+    {
+      "id": "badge",
+      "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/kiosk-badge/delivery/badge",
+      "campaignRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/kiosk-badge/delivery",
+      "grantIsKitRoot": true
+    },
+    {
+      "id": "posters",
+      "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/kiosk-badge/delivery/posters",
+      "campaignRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/kiosk-badge/delivery",
+      "grantIsKitRoot": true
+    }
+  ],
+  "smokeAuthorGood": {
+    "code": 0,
+    "parse": true,
+    "status": "pass",
+    "failedKits": [],
+    "failedIds": [],
+    "kits": [
+      {
+        "id": "icons",
+        "kind": "asset-delivery",
+        "present": true,
+        "status": "pass",
+        "failedIds": [],
+        "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/fixtures/good/icons"
+      },
+      {
+        "id": "covers",
+        "kind": "channel-cover",
+        "present": true,
+        "status": "pass",
+        "failedIds": [],
+        "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/fixtures/good/covers"
+      }
+    ],
+    "observer": "org.openadam.file.inspect@0.1.0"
+  },
+  "tasks": [
+    {
+      "id": "kiosk-badge",
+      "ok": true,
+      "expect": {
+        "status": "pass",
+        "failedKits": [],
+        "failedIds": []
+      },
+      "got": {
+        "code": 0,
+        "parse": true,
+        "status": "pass",
+        "failedKits": [],
+        "failedIds": [],
+        "kits": [
+          {
+            "id": "badge",
+            "kind": "asset-delivery",
+            "present": true,
+            "status": "pass",
+            "failedIds": [],
+            "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/kiosk-badge/delivery/badge"
+          },
+          {
+            "id": "posters",
+            "kind": "channel-cover",
+            "present": true,
+            "status": "pass",
+            "failedIds": [],
+            "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/kiosk-badge/delivery/posters"
+          }
+        ],
+        "observer": "org.openadam.file.inspect@0.1.0"
+      },
+      "whyDifferent": "New slot names (badge-24/48/96, plate, poster-*), new sizes (24/48/96/200x80 and 80/192x108/108x192), flat kit roots, two new kit ids. Not a rename of fixtures/good."
+    },
+    {
+      "id": "docs-social-broken",
+      "ok": true,
+      "expect": {
+        "status": "fail",
+        "failedKits": [
+          "social"
+        ],
+        "failedIds": [
+          "height",
+          "aspect"
+        ]
+      },
+      "got": {
+        "code": 1,
+        "parse": true,
+        "status": "fail",
+        "failedKits": [
+          "social"
+        ],
+        "failedIds": [
+          "height",
+          "aspect"
+        ],
+        "kits": [
+          {
+            "id": "favicons",
+            "kind": "asset-delivery",
+            "present": true,
+            "status": "pass",
+            "failedIds": [],
+            "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/docs-social/delivery/favicons"
+          },
+          {
+            "id": "social",
+            "kind": "channel-cover",
+            "present": true,
+            "status": "fail",
+            "failedIds": [
+              "height",
+              "aspect"
+            ],
+            "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/docs-social/delivery/social"
+          }
+        ],
+        "observer": "org.openadam.file.inspect@0.1.0"
+      },
+      "whyDifferent": "New names (favicon-32/64, card-square/wide/tall), new sizes (32/64 and 72/176x99/99x176), optional 4:5 slot left absent, different kit ids. First tree has a 176x100 JPEG on purpose."
+    },
+    {
+      "id": "docs-social-fixed",
+      "ok": true,
+      "expect": {
+        "status": "pass",
+        "failedKits": [],
+        "failedIds": []
+      },
+      "got": {
+        "code": 0,
+        "parse": true,
+        "status": "pass",
+        "failedKits": [],
+        "failedIds": [],
+        "kits": [
+          {
+            "id": "favicons",
+            "kind": "asset-delivery",
+            "present": true,
+            "status": "pass",
+            "failedIds": [],
+            "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/docs-social/delivery-fixed/favicons"
+          },
+          {
+            "id": "social",
+            "kind": "channel-cover",
+            "present": true,
+            "status": "pass",
+            "failedIds": [],
+            "workspaceRoot": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/tasks/docs-social/delivery-fixed/social"
+          }
+        ],
+        "observer": "org.openadam.file.inspect@0.1.0"
+      },
+      "fix": "Replace card-wide.jpg 176x100 with 176x99 (16:9). Favicons unchanged. Optional card-portrait still absent."
+    }
+  ],
+  "naive": {
+    "shortPathsFromWorkspaceRoot": {
+      "code": 2,
+      "stderr": "ENOENT: no such file or directory, open '/workspace/openadam-procedure-reuse/handoff/tasks/kiosk-badge/campaign.json'",
+      "status": null
+    },
+    "workspaceCwd": {
+      "code": 0,
+      "stderr": "",
+      "status": "pass"
+    }
+  },
+  "blockers": [],
+  "edits": [
+    {
+      "id": "replace-card-wide-jpeg",
+      "files": 1,
+      "note": "Replaced card-wide.jpg 176x100 with 176x99. Specs unchanged. Optional card-portrait still absent."
+    }
+  ],
+  "questions": [
+    {
+      "id": "cwd-short-paths",
+      "asked": "Can I paste HANDOFF --spec/--root paths from the workspace root?",
+      "answer": "No. HANDOFF requires cd into drafts/batch-delivery-preflight (or absolute/long paths). Short paths from the workspace root miss the spec file."
+    },
+    {
+      "id": "cwd-workspace-root",
+      "asked": "Can I run from the workspace root with long relative paths?",
+      "answer": "Yes if --spec/--root are correct; adapter still resolves from the CLI file location."
+    }
+  ],
+  "newFileHashes": [
+    {
+      "file": "handoff/tasks/kiosk-badge/delivery/badge/badge-24.png",
+      "sha256": "a5ceecdcc3f024ec4b4c9ea900498240d6c44949e663e3e67ccabd7b01e3ef9e"
+    },
+    {
+      "file": "handoff/tasks/kiosk-badge/delivery/badge/badge-48.png",
+      "sha256": "66fa075b9b0f9376127af236c46ee78f3b3ab2c25cedbc09004ed0c8dc178f5e"
+    },
+    {
+      "file": "handoff/tasks/kiosk-badge/delivery/badge/badge-96.png",
+      "sha256": "8ed88baf0a9700d95a2a853a37015205d86a911cc3bb41678d1efc95c1b38540"
+    },
+    {
+      "file": "handoff/tasks/kiosk-badge/delivery/badge/plate.png",
+      "sha256": "16657e0881a202fca2ac9e790fe73608849f93514a68510b366eed2f395d88de"
+    },
+    {
+      "file": "handoff/tasks/kiosk-badge/delivery/posters/poster-square.png",
+      "sha256": "3774761acb4cb054b4e3ce6307f602f77ca6182247072560e69e9c8c88dcacda"
+    },
+    {
+      "file": "handoff/tasks/kiosk-badge/delivery/posters/poster-tall.png",
+      "sha256": "bef22fd83961f765abed60c7d5bae53ee1ec6ee91c801e8ecc851886b65e3fd2"
+    },
+    {
+      "file": "handoff/tasks/kiosk-badge/delivery/posters/poster-wide.jpg",
+      "sha256": "78858044bc3d78f9c72e7588c3ddd1039876ca684fe42c120dc4f0584ad48178"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery/favicons/favicon-32.png",
+      "sha256": "ab4e6fbf7ed26b4bab96fd4d7ed86195423d6819fc2ae324ab1c7c9744fc1811"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery/favicons/favicon-64.png",
+      "sha256": "e57a7ab94ac90c85d7732a5a19a8cd43a881303c14b396892b927fa77d4c13a0"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery/social/card-square.png",
+      "sha256": "3987332e85a74bd4c480ed7d34dc4c25193feb95d24dc620f740a61c1cddf553"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery/social/card-tall.png",
+      "sha256": "82207a71db149ff0a5a6390b6d74d33a6fd440753f5e781b15a29ed0c6cbcab1"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery/social/card-wide.jpg",
+      "sha256": "933804034e0870b3e1038124f0e55395adda153f0a8ed7856adfdb7fcfa165d1"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery-fixed/favicons/favicon-32.png",
+      "sha256": "ab4e6fbf7ed26b4bab96fd4d7ed86195423d6819fc2ae324ab1c7c9744fc1811"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery-fixed/favicons/favicon-64.png",
+      "sha256": "e57a7ab94ac90c85d7732a5a19a8cd43a881303c14b396892b927fa77d4c13a0"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery-fixed/social/card-square.png",
+      "sha256": "3987332e85a74bd4c480ed7d34dc4c25193feb95d24dc620f740a61c1cddf553"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery-fixed/social/card-tall.png",
+      "sha256": "82207a71db149ff0a5a6390b6d74d33a6fd440753f5e781b15a29ed0c6cbcab1"
+    },
+    {
+      "file": "handoff/tasks/docs-social/delivery-fixed/social/card-wide.jpg",
+      "sha256": "505556e941336c25cf5eb27c4b0d2389165de4116c26732a3289647d16307fb4"
+    }
+  ]
+}

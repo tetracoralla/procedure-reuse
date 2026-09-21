@@ -1,0 +1,93 @@
+{
+  "short_paths_from_workspace_root": {
+    "code": 1,
+    "stderr": "node:internal/modules/cjs/loader:1215\n  throw err;\n  ^\n\nError: Cannot find module '/workspace/openadam-procedure-reuse/src/cli.mjs'\n\u001b[90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1212:15)\u001b[39m\n\u001b[90m    at Module._load (node:internal/modules/cjs/loader:1043:27)\u001b[39m\n\u001b[90m    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)\u001b[39m\n\u001b[90m    at node:internal/main/run_main_module:28:49\u001b[39m {\n  code: \u001b[32m'MODULE_NOT_FOUND'\u001b[39m,\n  requireStack: []\n}\n\nNode.js v20.19.2",
+    "stdout": ""
+  },
+  "m3_nested_prefix_on_flat_files": {
+    "code": 1,
+    "stderr": "",
+    "status": "fail",
+    "failedKits": [
+      "posters"
+    ],
+    "failedIds": [
+      "missing",
+      "extra"
+    ],
+    "failed": [
+      {
+        "kit": "posters",
+        "id": "missing",
+        "slot": "poster-square",
+        "path": "posters/poster-square.png",
+        "expected": "posters/poster-square.png",
+        "observed": null
+      },
+      {
+        "kit": "posters",
+        "id": "missing",
+        "slot": "poster-wide",
+        "path": "posters/poster-wide.jpg",
+        "expected": "posters/poster-wide.jpg",
+        "observed": null
+      },
+      {
+        "kit": "posters",
+        "id": "missing",
+        "slot": "poster-tall",
+        "path": "posters/poster-tall.png",
+        "expected": "posters/poster-tall.png",
+        "observed": null
+      },
+      {
+        "kit": "posters",
+        "id": "extra",
+        "path": "poster-square.png",
+        "expected": null,
+        "observed": "poster-square.png"
+      },
+      {
+        "kit": "posters",
+        "id": "extra",
+        "path": "poster-tall.png",
+        "expected": null,
+        "observed": "poster-tall.png"
+      },
+      {
+        "kit": "posters",
+        "id": "extra",
+        "path": "poster-wide.jpg",
+        "expected": null,
+        "observed": "poster-wide.jpg"
+      }
+    ]
+  },
+  "readme_inside_kit_root": {
+    "code": 1,
+    "stderr": "",
+    "status": "fail",
+    "failedKits": [
+      "badge"
+    ],
+    "failedIds": [
+      "extra"
+    ],
+    "failed": [
+      {
+        "kit": "badge",
+        "id": "extra",
+        "path": "README.md",
+        "expected": null,
+        "observed": "README.md"
+      }
+    ]
+  },
+  "aesthetic_field": {
+    "code": 2,
+    "stderr": "/workspace/openadam-procedure-reuse/drafts/batch-delivery-preflight/handoff/observations/trap-aesthetic.json contains forbidden field quality (technical preflight only; no brand/copy/generation)",
+    "stdout": ""
+  },
+  "uniqueness_overlap": [],
+  "new_pixel_count": 17
+}

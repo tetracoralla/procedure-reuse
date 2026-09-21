@@ -1,0 +1,3 @@
+This project is an incomplete generated compose/Procedure scaffold.
+Remove this marker only after replacing src/spec.mjs, src/compare.mjs, fixtures, procedure conformance, Skill, and legal files with the product-specific implementation.
+The spec file already drives missing/extra. Present-file comparison must not remain CORE_NOT_IMPLEMENTED.

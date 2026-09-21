@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "openadam.procedure-profile.v0.5",
+  "id": "org.openadam.batch-delivery.preflight",
+  "version": "0.1.0",
+  "title": "Preflight a two-kit delivery campaign",
+  "summary": "Read a batch-delivery campaign spec (icon suite plus channel-cover suite) and a campaign directory. The adapter dispatches each present kit to an existing combinator (asset-delivery-preflight or channel-cover-preflight) by ordinary function import. Those combinators observe present files with org.openadam.file.inspect@0.1.0 inspect (File Vitals) using a per-kit workspace grant. The campaign aggregates kit status, lifts failed checks with kit/slot/id, and records kitMissing when a required kit directory is absent. Comparison stays in the lower methods. This Procedure does not implement raster.verify, does not nest Direct Runtime, and does not generate missing assets.",
+  "lifecycle": "experimental",
+  "semantics": {
+    "resultVariability": "deterministic",
+    "contextSources": ["referenced-resource"],
+    "stateAccess": "read",
+    "idempotency": "idempotent",
+    "openWorld": false
+  },
+  "inputSchema": {
+    "$ref": "./schemas/input.schema.json"
+  },
+  "outputSchema": {
+    "$ref": "./schemas/output.schema.json"
+  },
+  "stages": [
+    {
+      "kind": "capability",
+      "id": "inspect-files",
+      "title": "Inspect declared kit files",
+      "purpose": "The adapter internally dispatches each present kit to an existing combinator. Each combinator schedules org.openadam.file.inspect inspect once per present declared slot path (JSONL sessions of at most 16). Inspect workspace grants are the kit root, not the campaign root. Missing required kit directories skip inspect and become kitMissing. Slot comparison remains in the lower combinators and is not raster.verify.",
+      "required": true,
+      "dependsOn": [],
+      "capability": {
+        "id": "org.openadam.file.inspect",
+        "version": "0.1.0",
+        "operationId": "inspect"
+      }
+    }
+  ],
+  "completion": {
+    "description": "Completion is the aggregated campaign report: per-kit status, lifted checks with kit localization, and suite status pass|fail. That report is combinator output after lower preflights, not a raw inspect envelope and not a raster.verify result.",
+    "outputStage": "inspect-files"
+  },
+  "errors": [
+    {
+      "code": "INVALID_INPUT",
+      "description": "The Procedure input is outside the portable contract or the campaign spec cannot be parsed.",
+      "retryable": false
+    },
+    {
+      "code": "ROOT_NOT_FOUND",
+      "description": "The campaign root is missing or is not a directory inside the implementation grant.",
+      "retryable": false
+    },
+    {
+      "code": "PATH_FORBIDDEN",
+      "description": "A requested path is absolute, contains .., or escapes the implementation root.",
+      "retryable": false
+    },
+    {
+      "code": "LIMIT_EXCEEDED",
+      "description": "The kit list exceeds the declared Procedure bound of 8 kits.",
+      "retryable": false
+    },
+    {
+      "code": "PROVIDER_FAILED",
+      "description": "The File Vitals inspect adapter, a lower combinator, or the Procedure adapter failed safely outside a more specific error.",
+      "retryable": true
+    }
+  ]
+}
